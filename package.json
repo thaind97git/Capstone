@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "start": "NODE_ENV=production next"
+    "start": "NODE_ENV=production next",
+    "heroku-postbuild": "npm run build"
   },
   "prettier": {
     "quotes": true,

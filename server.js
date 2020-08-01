@@ -5,15 +5,15 @@ const environment = process.env.NODE_ENV || 'development';
 
 let envFilePath = 'env/.env';
 
-if (environment !== 'production') {
-  envFilePath = envFilePath + '.' + environment;
-}
+// if (environment !== 'production') {
+//   envFilePath = envFilePath + '.' + environment;
+// }
 
 require('dotenv').config({
   path: envFilePath
 });
 
-const port = parseInt(process.env.NODE_PORT, 10) || 3000;
+const port = parseInt(process.env.PORT, 10) || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
