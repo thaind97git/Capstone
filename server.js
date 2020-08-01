@@ -5,9 +5,9 @@ const environment = process.env.NODE_ENV || 'development';
 
 let envFilePath = 'env/.env';
 
-// if (environment !== 'production') {
-//   envFilePath = envFilePath + '.' + environment;
-// }
+if (environment !== 'production') {
+  envFilePath = envFilePath + '.' + environment;
+}
 
 require('dotenv').config({
   path: envFilePath
