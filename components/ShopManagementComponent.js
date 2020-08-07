@@ -39,7 +39,7 @@ const connectWithRedux = connect(
     updateShopData: UpdateShopDataSelector
   }),
   dispatch => ({
-    getShops: () => dispatch(getShops({})),
+    getShops: (page, pageSize) => dispatch(getShops({ page, pageSize })),
     resetData: () => {
       dispatch(AddNewServiceResetter);
       dispatch(UpdateServiceResetter);
@@ -128,7 +128,7 @@ const getData = ({ shopsData = [], setCurrentIdSelected, setIsOpenUpdate }) =>
       description,
       longtitude,
       latitude,
-      numOfStart,
+      numOfStar,
       email,
       address,
       phoneNumber,
@@ -149,7 +149,7 @@ const getData = ({ shopsData = [], setCurrentIdSelected, setIsOpenUpdate }) =>
       phoneNumber: phoneNumber,
       longtitude: longtitude,
       latitude: latitude,
-      numOfStart: <RatingComponent star={numOfStart} />,
+      numOfStart: <RatingComponent star={numOfStar} />,
       email: email,
       address: <ShortenContentComponent content={address} />,
       description: description,
@@ -162,19 +162,21 @@ const getData = ({ shopsData = [], setCurrentIdSelected, setIsOpenUpdate }) =>
           style={status ? { background: 'green', color: 'white' } : {}}
         />
       ),
-      actions: getActions({
-        status,
-        id,
-        setCurrentIdSelected,
-        setIsOpenUpdate
-      }).map(({ label, action, icon }, index) => (
-        <ButtonActionTableComponent
-          key={index}
-          label={label}
-          action={action}
-          icon={icon}
-        />
-      ))
+      actions: status
+        ? getActions({
+            status,
+            id,
+            setCurrentIdSelected,
+            setIsOpenUpdate
+          }).map(({ label, action, icon }, index) => (
+            <ButtonActionTableComponent
+              key={index}
+              label={label}
+              action={action}
+              icon={icon}
+            />
+          ))
+        : null
     })
   );
 
@@ -209,7 +211,7 @@ const ShopManagementComponent = ({
     page = 0,
     pageSize = 10;
   if (shopsData) {
-    totalCount = shopsData.length;
+    totalCount = shopsData.totalElements;
   }
 
   return (
@@ -248,7 +250,7 @@ const ShopManagementComponent = ({
       <ReactTableLayout
         dispatchAction={getShops}
         data={getData({
-          shopsData: shopsData || [],
+          shopsData: (shopsData || {}).content || [],
           setCurrentIdSelected,
           setIsOpenUpdate
         })}

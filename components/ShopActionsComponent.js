@@ -10,12 +10,15 @@ import RenderFieldComponent from './FormFields/RenderFieldComponent';
 
 import { required, emailValidation } from '../utils/validation';
 import RenderSwitchFieldComponent from './FormFields/RenderSwitchFieldComponent';
+import RenderTimePickerFieldComponent from './FormFields/RenderTimePickerFieldComponent';
 import {
   addNewShop,
   getShopById,
   GetShopByIdResetter,
-  GetShopByIdDataSelector
+  GetShopByIdDataSelector,
+  updateShop
 } from '../stores/ShopState';
+import { formatAMPM } from '../utils';
 const connectToRedux = connect(
   createStructuredSelector({
     initialValues: GetShopByIdDataSelector
@@ -25,6 +28,8 @@ const connectToRedux = connect(
       if ('status' in values) {
         dispatch(updateShop(values));
       } else {
+        values.openTime = formatAMPM(new Date(values.openTime));
+        values.closeTime = formatAMPM(new Date(values.closeTime));
         dispatch(addNewShop(values));
       }
     },
@@ -90,6 +95,45 @@ const ShopActionComponent = ({
             label="Address"
             validate={[required]}
           />
+          {isUpdate ? (
+            <Fragment>
+              <Field
+                col={6}
+                name="openTime"
+                component={RenderFieldComponent}
+                placeholder="Open Time"
+                label="Open Time"
+                validate={[required]}
+              />
+              <Field
+                col={6}
+                name="closeTime"
+                component={RenderFieldComponent}
+                placeholder="Close Time"
+                label="Close Time"
+                validate={[required]}
+              />
+            </Fragment>
+          ) : (
+            <Fragment>
+              <Field
+                col={6}
+                name="openTime"
+                component={RenderTimePickerFieldComponent}
+                placeholder="Open Time"
+                label="Open Time"
+                validate={[required]}
+              />
+              <Field
+                col={6}
+                name="closeTime"
+                component={RenderTimePickerFieldComponent}
+                placeholder="Close Time"
+                label="Close Time"
+                validate={[required]}
+              />
+            </Fragment>
+          )}
           <Field
             col={6}
             name="description"

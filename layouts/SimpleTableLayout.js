@@ -101,6 +101,7 @@ const ReactTableLayout = ({
   const [pageSizeTable, setPageSizeTable] = useState(pageSize);
   const [pageIndex, setPageIndex] = useState(page);
   const [isFetchPaging, setIsFetchPaging] = useState(true);
+  const [isReFetchWithNoPaging, setIsReFetchWithNoPaging] = useState(true);
 
   useEffect(() => {
     if (hasPaging && !hasAction) {
@@ -119,10 +120,9 @@ const ReactTableLayout = ({
   ]);
 
   useEffect(() => {
-    if (!hasPaging) {
-      doDispatchAction(
-        typeof dispatchAction === 'function' && dispatchAction()
-      );
+    if (!hasPaging && isReFetchWithNoPaging === true) {
+      typeof dispatchAction === 'function' && dispatchAction();
+      setIsReFetchWithNoPaging(false);
     }
   }, [hasPaging, dispatchAction]);
 

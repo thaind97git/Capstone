@@ -22,12 +22,12 @@ export const GET_SERVICES_BY_SHOP_ID = 'GET_SERVICES_BY_SHOP_ID';
 //Get shop
 export const GetShopsAPI = makeFetchAction(GET_SHOP, ({ page, pageSize }) =>
   nfetch({
-    endpoint: `/shop/shops?page=${page}&size=${pageSize}`,
+    endpoint: `/shop/getAllShopPaging?page=${page}&size=${pageSize}`,
     method: 'GET'
   })()
 );
-export const getShops = ({}) =>
-  respondToSuccess(GetShopsAPI.actionCreator({}), () => {});
+export const getShops = ({ page, pageSize }) =>
+  respondToSuccess(GetShopsAPI.actionCreator({ page, pageSize }), () => {});
 export const GetShopsDataSelector = GetShopsAPI.dataSelector;
 
 // Add new Shop
@@ -61,8 +61,7 @@ export const DeleteShopResetter = getResetter(DeleteShopAPI);
 // Update Shop
 export const UpdateShopAPI = makeFetchAction(UPDATE_SHOP, values =>
   nfetch({
-    endpoint: `/shop/${values.id}`,
-    method: 'PUT'
+    endpoint: `/shop/update/${values.id}`
   })(values)
 );
 export const updateShop = values =>
@@ -155,15 +154,15 @@ export const GetServiceByIdResetter = getResetter(GetServiceByIdAPI);
 // Get service by shop id
 export const GetServicesByShopIdAPI = makeFetchAction(
   GET_SERVICES_BY_SHOP_ID,
-  ({ id, page = 0, pageSize = 10 }) =>
+  ({ shopId, page = 0, pageSize = 10 }) =>
     nfetch({
-      endpoint: `/shop/getShopServiceByShopId?shopId=${id}&page=${page}&size=${pageSize}`,
+      endpoint: `/shop/getShopServiceByShopId?shopId=${shopId}&page=${page}&size=${pageSize}`,
       method: 'GET'
     })()
 );
-export const getServicesByShopId = ({ id, page, pageSize }) =>
+export const getServicesByShopId = ({ shopId, page, pageSize }) =>
   respondToSuccess(
-    GetServicesByShopIdAPI.actionCreator({ id, page, pageSize }),
+    GetServicesByShopIdAPI.actionCreator({ shopId, page, pageSize }),
     () => {}
   );
 export const GetServicesByShopIdDataSelector =
