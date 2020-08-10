@@ -16,30 +16,49 @@ import {
   getShopById,
   GetShopByIdResetter,
   GetShopByIdDataSelector,
-  updateShop
+  updateShop,
+  getDistricts,
+  GetDistrictsDataSelector
 } from '../stores/ShopState';
 import { formatAMPM } from '../utils';
+import RenderImageFieldComponent from './FormFields/RenderImageFieldComponent';
+import RenderSelectFieldComponent from './FormFields/RenderSelectFieldComponent';
+import { getUserID } from '../libs/user-libs';
 const connectToRedux = connect(
   createStructuredSelector({
-    initialValues: GetShopByIdDataSelector
+    initialValues: GetShopByIdDataSelector,
+    districtData: GetDistrictsDataSelector
   }),
   dispatch => ({
     onSubmit: values => {
+      console.log({ values });
       if ('status' in values) {
         dispatch(updateShop(values));
       } else {
+        values.userId = getUserID();
         values.openTime = formatAMPM(new Date(values.openTime));
         values.closeTime = formatAMPM(new Date(values.closeTime));
         dispatch(addNewShop(values));
       }
     },
     getShopById: id => dispatch(getShopById(id)),
-    resetData: () => dispatch(GetShopByIdResetter)
+    resetData: () => dispatch(GetShopByIdResetter),
+    getAllDistrict: () => dispatch(getDistricts())
   })
 );
 
 const withForm = reduxForm({ form: 'addNewShop' });
 const enhance = compose(connectToRedux, withForm);
+
+const getDistrictOptions = ({ districtData = [] }) => {
+  return (
+    districtData &&
+    districtData.map(district => ({
+      label: district.district,
+      value: district.id
+    }))
+  );
+};
 
 const ShopActionComponent = ({
   handleSubmit,
@@ -49,8 +68,13 @@ const ShopActionComponent = ({
   isUpdate = false,
   id,
   getShopById,
-  resetData
+  resetData,
+  districtData,
+  getAllDistrict
 }) => {
+  useEffect(() => {
+    getAllDistrict();
+  }, [getAllDistrict]);
   useEffect(() => {
     if (id) {
       getShopById(id);
@@ -95,6 +119,7 @@ const ShopActionComponent = ({
             label="Address"
             validate={[required]}
           />
+
           {isUpdate ? (
             <Fragment>
               <Field
@@ -141,14 +166,24 @@ const ShopActionComponent = ({
             placeholder="Description"
             label="Description"
           />
+          <Field
+            col={6}
+            label="District"
+            name="districtId"
+            component={RenderSelectFieldComponent}
+            options={getDistrictOptions({ districtData: districtData || [] })}
+            validate={[required]}
+          />
+
           {isUpdate && (
             <Field
-              col={12}
+              col={6}
               name="status"
               component={RenderSwitchFieldComponent}
               label="Status"
             />
           )}
+          <Field col={6} name="avtUrl" component={RenderImageFieldComponent} />
           <Grid container justify="center">
             <Grid>
               <Button type="submit" disabled={pristine || submitting}>

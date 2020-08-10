@@ -42,7 +42,7 @@ const connectToRedux = connect(
 const withForm = reduxForm({ form: 'addNewCategory' });
 const enhance = compose(connectToRedux, withForm);
 
-const CategoryAddingComponent = ({
+const CategoryActionsComponent = ({
   handleSubmit,
   pristine,
   submitting,
@@ -107,4 +107,4 @@ const CategoryAddingComponent = ({
   );
 };
 
-export default enhance(CategoryAddingComponent);
+export default enhance(CategoryActionsComponent);

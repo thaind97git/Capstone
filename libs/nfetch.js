@@ -5,17 +5,23 @@ import getHeaders from './getHeaders';
 export const objectToQuery = flow(
   pickBy(identity),
   toPairs,
-  map((val) => `${val[0]}=${val[1]}`),
+  map(val => `${val[0]}=${val[1]}`),
   join('&'),
   trim
 );
 
-export default ({ endpoint, method = 'POST' }) => (
+const nfetch = ({ endpoint, method = 'POST', formData = false }) => (
   variables = {},
   opts = {}
 ) => {
   let curEndpoint = process.env.DOMAIN_SERVER + endpoint;
-  console.log({ curEndpoint });
+  console.log({ curEndpoint, headersOption: opts.headers });
+  const formDataValue = new FormData();
+  if (formData) {
+    for (var key in variables) {
+      formDataValue.append(key, variables[key]);
+    }
+  }
 
   if (method === 'GET') {
     const query = objectToQuery(variables);
@@ -30,7 +36,8 @@ export default ({ endpoint, method = 'POST' }) => (
       endpoint: curEndpoint,
       method,
       headers: getHeaders(opts.headers),
-      body: JSON.stringify(variables)
+      body: !formData ? JSON.stringify(variables) : formDataValue
     };
   }
 };
+export default nfetch;

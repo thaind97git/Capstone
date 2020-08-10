@@ -1,7 +1,9 @@
 import React from 'react';
 import CardSimpleLayout from '../layouts/CardSimpleLayout';
 import { Grid, TextField, Button, makeStyles } from '@material-ui/core';
-const useStyles = makeStyles((theme) => ({
+import { connect } from 'react-redux';
+import { getUserById, GetUserByIdDataSelector } from '../stores/userState';
+const useStyles = makeStyles(theme => ({
   root: {
     padding: theme.spacing(2)
   },
@@ -10,8 +12,20 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const SettingsComponent = () => {
+const connectWithRedux = connect(
+  createStructuredSelector({
+    currentUserData: GetUserByIdDataSelector
+  }),
+  dispatch => ({
+    getUserById: () => dispatch(getUserById())
+  })
+);
+
+const SettingsComponent = ({ currentUserData }) => {
   const classes = useStyles();
+  if (!currentUserData) {
+    return null;
+  }
   return (
     <Grid container spacing={3}>
       <Grid item md={12} lg={12}>
@@ -99,4 +113,4 @@ const SettingsComponent = () => {
   );
 };
 
-export default SettingsComponent;
+export default connectWithRedux(SettingsComponent);

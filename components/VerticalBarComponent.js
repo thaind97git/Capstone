@@ -25,7 +25,10 @@ import {
   DesktopMac,
   AccountCircle,
   Settings,
-  ExitToApp
+  ExitToApp,
+  Storefront,
+  DeviceHub,
+  Category
 } from '@material-ui/icons';
 import { removeToken } from '../libs/token-libs';
 
@@ -95,23 +98,17 @@ const menuStructures = [
   {
     name: 'user',
     label: 'User',
-    icon: <AccountCircle fontSize="small" />,
-    subPaths: [
-      {
-        label: 'Manage User',
-        name: 'manage'
-      }
-    ]
+    icon: <AccountCircle fontSize="small" />
   },
   {
     name: 'roles',
     label: 'Role',
-    icon: <AccountCircle fontSize="small" />
+    icon: <DeviceHub fontSize="small" />
   },
   {
     name: 'category',
     label: 'Category',
-    icon: <AccountCircle fontSize="small" />,
+    icon: <Category fontSize="small" />,
     subPaths: [
       {
         label: 'Manage Category',
@@ -126,17 +123,7 @@ const menuStructures = [
   {
     name: 'shop',
     label: 'Shop',
-    icon: <AccountCircle fontSize="small" />,
-    subPaths: [
-      {
-        label: 'Manage Shop',
-        name: 'manage'
-      },
-      {
-        label: 'Details',
-        name: 'details'
-      }
-    ]
+    icon: <Storefront fontSize="small" />
   },
   {
     name: 'settings',

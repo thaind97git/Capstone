@@ -14,6 +14,7 @@ export const GET_SHOP_BY_ID = 'GET_SHOP_BY_ID';
 
 // Service
 const GET_SERVICE = 'GET_SERVICE';
+const GET_DISTRICT = 'GET_DISTRICT';
 export const ADD_NEW_SERVICE = 'ADD_NEW_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
 export const GET_SERVICE_BY_ID = 'GET_SERVICE_BY_ID';
@@ -31,14 +32,14 @@ export const getShops = ({ page, pageSize }) =>
 export const GetShopsDataSelector = GetShopsAPI.dataSelector;
 
 // Add new Shop
-export const AddNewShopAPI = makeFetchAction(ADD_NEW_SHOP, values =>
-  nfetch({
-    endpoint: '/shop/createShop'
-  })(values)
-);
+export const AddNewShopAPI = makeFetchAction(ADD_NEW_SHOP, values => {
+  return nfetch({
+    endpoint: '/shop/createNewShop'
+  })(values);
+});
 export const addNewShop = values =>
   respondToSuccess(AddNewShopAPI.actionCreator(values), (resp, _, store) => {
-    store.dispatch(getShops({}));
+    store.dispatch(getShops({ page: 0, pageSize: 10 }));
   });
 export const AddNewShopDataSelector = AddNewShopAPI.dataSelector;
 export const AddNewShopErrorSelector = AddNewShopAPI.errorSelector;
@@ -61,12 +62,13 @@ export const DeleteShopResetter = getResetter(DeleteShopAPI);
 // Update Shop
 export const UpdateShopAPI = makeFetchAction(UPDATE_SHOP, values =>
   nfetch({
-    endpoint: `/shop/update/${values.id}`
+    endpoint: `/shop/updateShop/${values.id}`,
+    method: 'PUT'
   })(values)
 );
 export const updateShop = values =>
   respondToSuccess(UpdateShopAPI.actionCreator(values), (resp, _, store) => {
-    store.dispatch(getShops({}));
+    store.dispatch(getShops({ page: 0, pageSize: 10 }));
   });
 export const UpdateShopDataSelector = UpdateShopAPI.dataSelector;
 export const UpdateShopResetter = getResetter(UpdateShopAPI);
@@ -168,3 +170,14 @@ export const getServicesByShopId = ({ shopId, page, pageSize }) =>
 export const GetServicesByShopIdDataSelector =
   GetServicesByShopIdAPI.dataSelector;
 export const GetServicesByShopIdResetter = getResetter(GetServicesByShopIdAPI);
+
+//Get District
+export const GetDistrictsAPI = makeFetchAction(GET_DISTRICT, () =>
+  nfetch({
+    endpoint: `/getAllDistrict`,
+    method: 'GET'
+  })()
+);
+export const getDistricts = () =>
+  respondToSuccess(GetDistrictsAPI.actionCreator(), () => {});
+export const GetDistrictsDataSelector = GetDistrictsAPI.dataSelector;

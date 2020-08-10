@@ -18,7 +18,12 @@ import FrameHeaderComponent from './FrameHeaderComponent';
 import Button from '../layouts/Button';
 import AlertDialog from '../layouts/AlertDialog';
 import RoleAddingComponent from './RoleAddingComponent';
-import { getUsers, GetUsersDataSelector } from '../stores/userState';
+import {
+  getUsers,
+  GetUsersDataSelector,
+  banUser,
+  unbBanUser
+} from '../stores/userState';
 import AvatarComponent from './AvatarComponent';
 import DisplayShortenComponent from './commons/DisplayShotenComponent';
 
@@ -29,31 +34,37 @@ const connectWithRedux = connect(
     // addRoleErrorMessage: AddNewRoleErrorSelector
   }),
   dispatch => ({
-    getUsers: (page, size) => dispatch(getUsers({ page, size }))
+    getUsers: (page, size) => dispatch(getUsers({ page, size })),
+    banUser: id => dispatch(banUser(id)),
+    unBanUser: id => dispatch(unbBanUser(id))
     // addNewUser: name => dispatch(addNewRole(name)),
     // resetData: () => dispatch(AddNewRoleResetter),
     // resetAddRoleForm: () => dispatch(reset('addNewRole'))
   })
 );
 
-const getMemberManagementActions = ({ status, id }) => {
-  return status
+const getMemberManagementActions = ({ enabled, id, banUser, unBanUser }) => {
+  return !enabled
     ? [
         {
           label: 'Active User',
-          action: () => {},
+          action: () => unBanUser(id),
           icon: <LockOpen />
         }
       ]
     : [
         {
           label: 'Disable User',
-          action: () => {},
+          action: () => banUser(id),
           icon: <Lock />
         }
       ];
 };
 const COLUMNS = [
+  {
+    field: 'avatar',
+    title: 'Avatar'
+  },
   {
     field: 'fullName',
     title: 'Full Name'
@@ -92,7 +103,7 @@ const COLUMNS = [
   }
 ];
 
-const getData = (roles = []) =>
+const getData = (roles = [], banUser, unBanUser) =>
   roles &&
   roles.map(
     ({
@@ -101,19 +112,14 @@ const getData = (roles = []) =>
       avtUrl,
       createdTime,
       email,
-      enabled,
+      status: enabled,
       fullName,
       latitude,
       longtitude,
       phoneNumber
     }) => ({
-      fullName: (
-        <Grid container alignItems="center" direction="row">
-          <AvatarComponent small url={avtUrl} />
-          <span>&nbsp;&nbsp;</span>
-          {fullName}
-        </Grid>
-      ),
+      avatar: <AvatarComponent small url={avtUrl} />,
+      fullName: fullName,
       email: email,
       phoneNumber: phoneNumber,
       address: <DisplayShortenComponent>{address}</DisplayShortenComponent>,
@@ -129,9 +135,12 @@ const getData = (roles = []) =>
           style={enabled ? { background: 'green', color: 'white' } : {}}
         />
       ),
-      actions: getMemberManagementActions(
-        (enabled, id)
-      ).map(({ label, action, icon }, index) => (
+      actions: getMemberManagementActions({
+        enabled,
+        id,
+        banUser,
+        unBanUser
+      }).map(({ label, action, icon }, index) => (
         <ButtonActionTableComponent
           key={index}
           label={label}
@@ -144,7 +153,9 @@ const getData = (roles = []) =>
 
 const UserManagementComponent = ({
   usersData,
-  getUsers
+  getUsers,
+  banUser,
+  unBanUser
   // addNewRole,
   // addRoleSuccessMessage,
   // resetData,
@@ -184,7 +195,7 @@ const UserManagementComponent = ({
       </FrameHeaderComponent>
       <ReactTableLayout
         dispatchAction={getUsers}
-        data={getData((usersData || {}).content)}
+        data={getData((usersData || {}).content, banUser, unBanUser)}
         columns={COLUMNS}
         totalCount={totalCount}
         page={page}

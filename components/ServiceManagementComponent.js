@@ -22,7 +22,7 @@ import {
   AddNewServiceResetter,
   UpdateServiceResetter
 } from '../stores/CategoryState';
-import CategoryAddingComponent from './CategoryAddingComponent';
+import CategoryActionsComponent from './CategoryActionsComponent';
 import ServiceActionComponent from './ServiceActionComponent';
 
 const connectWithRedux = connect(

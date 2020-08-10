@@ -1,6 +1,6 @@
 import { merge, get } from 'lodash/fp';
 import { ACTIONS } from 'redux-api-call';
-import { LOGIN_USER } from './userState';
+import { LOGIN_USER, UPDATE_USER_STATUS } from './userState';
 import { ADD_NEW_ROLE } from './RoleState';
 import { DEFAULT_OPTION_TOAST } from '../utils/options';
 import {
@@ -75,6 +75,9 @@ export default {
         case UPDATE_SHOP:
           msgNotify = 'Update shop success';
           break;
+        case UPDATE_USER_STATUS:
+          msgNotify = 'Update user status success';
+          break;
         default:
           break;
       }
@@ -111,6 +114,9 @@ export default {
           break;
         case UPDATE_SHOP:
           msgNotify = 'Update shop fail';
+          break;
+        case UPDATE_USER_STATUS:
+          msgNotify = 'Update user status fail';
           break;
         default:
           break;

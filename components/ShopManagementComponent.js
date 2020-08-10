@@ -73,6 +73,10 @@ const getActions = ({ status, id, setCurrentIdSelected, setIsOpenUpdate }) => {
 };
 const COLUMNS = [
   {
+    field: 'avatar',
+    title: 'Avatar'
+  },
+  {
     field: 'shopName',
     title: 'Name'
   },
@@ -122,6 +126,7 @@ const getData = ({ shopsData = [], setCurrentIdSelected, setIsOpenUpdate }) =>
   shopsData &&
   shopsData.map(
     ({
+      avatarUrl,
       shopName,
       status,
       id,
@@ -132,18 +137,17 @@ const getData = ({ shopsData = [], setCurrentIdSelected, setIsOpenUpdate }) =>
       email,
       address,
       phoneNumber,
-      userInfoDTO = {}
+      user = {}
     }) => ({
+      avatar: <AvatarComponent small url={avatarUrl} />,
       shopName: (
         <Link href={createLink(['shop', `details?id=${id}`])}>
           <a>{shopName}</a>
         </Link>
       ),
       owner: (
-        <Link
-          href={createLink(['user', `details?id=${(userInfoDTO || {}).id}`])}
-        >
-          <a>{(userInfoDTO || {}).fullName}</a>
+        <Link href={createLink(['user', `details?id=${(user || {}).id}`])}>
+          <a>{(user || {}).fullName}</a>
         </Link>
       ),
       phoneNumber: phoneNumber,

@@ -16,9 +16,10 @@ import {
   AddNewCategoryResetter,
   DeleteCategoryResetter,
   UpdateCategoryDataSelector,
-  UpdateCategoryResetter
+  UpdateCategoryResetter,
+  updateCategory
 } from '../stores/CategoryState';
-import CategoryAddingComponent from './CategoryAddingComponent';
+import CategoryActionsComponent from './CategoryActionsComponent';
 
 const connectWithRedux = connect(
   createStructuredSelector({
@@ -33,20 +34,29 @@ const connectWithRedux = connect(
       dispatch(DeleteCategoryResetter);
       dispatch(UpdateCategoryResetter);
     },
-    resetAddCategoryForm: () => dispatch(reset('addNewCategory'))
+    resetAddCategoryForm: () => dispatch(reset('addNewCategory')),
+    activeCategory: values =>
+      dispatch(updateCategory({ ...values, status: true })),
+    disableCategory: values =>
+      dispatch(updateCategory({ ...values, status: false }))
   })
 );
 
-const getActions = ({ status, id, setCurrentIdSelected, setIsOpenUpdate }) => {
+const getActions = ({
+  status,
+  id,
+  setCurrentIdSelected,
+  setIsOpenUpdate,
+  activeCategory,
+  disableCategory,
+  category
+}) => {
   return !status
     ? [
         {
-          label: 'Edit category',
-          action: () => {
-            setIsOpenUpdate(true);
-            setCurrentIdSelected(id);
-          },
-          icon: <Edit />
+          label: 'Active Category',
+          action: () => activeCategory(category),
+          icon: <LockOpen />
         }
       ]
     : [
@@ -57,6 +67,11 @@ const getActions = ({ status, id, setCurrentIdSelected, setIsOpenUpdate }) => {
             setCurrentIdSelected(id);
           },
           icon: <Edit />
+        },
+        {
+          label: 'Disable Category',
+          action: () => disableCategory(category),
+          icon: <Lock />
         }
       ];
 };
@@ -82,26 +97,31 @@ const COLUMNS = [
 const getData = ({
   categoriesData = [],
   setCurrentIdSelected,
-  setIsOpenUpdate
+  setIsOpenUpdate,
+  activeCategory,
+  disableCategory
 }) =>
   categoriesData &&
-  categoriesData.map(({ categoryName, status, id, description }) => ({
-    name: categoryName,
-    description: description,
+  categoriesData.map(category => ({
+    name: category.categoryName,
+    description: category.description,
     status: (
       <Chip
-        label={status ? 'Active' : 'Disabled'}
+        label={category.status ? 'Active' : 'Disabled'}
         clickable
-        color={!status ? 'secondary' : 'default'}
-        deleteIcon={status ? <Done /> : <Lock />}
-        style={status ? { background: 'green', color: 'white' } : {}}
+        color={!category.status ? 'secondary' : 'default'}
+        deleteIcon={category.status ? <Done /> : <Lock />}
+        style={category.status ? { background: 'green', color: 'white' } : {}}
       />
     ),
     actions: getActions({
-      status,
-      id,
+      status: category.status,
+      id: category.id,
       setCurrentIdSelected,
-      setIsOpenUpdate
+      setIsOpenUpdate,
+      activeCategory,
+      disableCategory,
+      category
     }).map(({ label, action, icon }, index) => (
       <ButtonActionTableComponent
         key={index}
@@ -118,7 +138,9 @@ const CategoryManagementComponent = ({
   addCategorySuccessMessage,
   resetData,
   resetAddCategoryForm,
-  updateCategoryData
+  updateCategoryData,
+  activeCategory,
+  disableCategory
 }) => {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
@@ -155,7 +177,7 @@ const CategoryManagementComponent = ({
         isFooter={false}
         size="xs"
         fullWidth
-        content={isOpenAdd ? <CategoryAddingComponent /> : null}
+        content={isOpenAdd ? <CategoryActionsComponent /> : null}
       />
       <AlertDialog
         title="Update category"
@@ -166,7 +188,7 @@ const CategoryManagementComponent = ({
         fullWidth
         content={
           isOpenUpdate ? (
-            <CategoryAddingComponent isUpdate id={currentIdSelected} />
+            <CategoryActionsComponent isUpdate id={currentIdSelected} />
           ) : null
         }
         onClose={() => {
@@ -182,7 +204,9 @@ const CategoryManagementComponent = ({
         data={getData({
           categoriesData: categoriesData || [],
           setCurrentIdSelected,
-          setIsOpenUpdate
+          setIsOpenUpdate,
+          activeCategory,
+          disableCategory
         })}
         columns={COLUMNS}
         totalCount={totalCount}
