@@ -15,6 +15,7 @@ import {
   UPDATE_CATEGORY
 } from './CategoryState';
 import { ADD_NEW_SHOP, UPDATE_SHOP } from './ShopState';
+import { ADD_NEW_CONFIG, DELETE_CONFIG, UPDATE_CONFIG } from './ConfigState';
 export const ENQUEUE_SNACKBAR = 'ENQUEUE_SNACKBAR';
 export const REMOVE_TOAST = 'REMOVE_TOAST';
 
@@ -69,6 +70,15 @@ export default {
         case UPDATE_CATEGORY:
           msgNotify = 'Update category success';
           break;
+        case ADD_NEW_CONFIG:
+          msgNotify = 'Add new config success';
+          break;
+        case DELETE_CONFIG:
+          msgNotify = 'Delete config success';
+          break;
+        case UPDATE_CONFIG:
+          msgNotify = 'Update config success';
+          break;
         case ADD_NEW_SHOP:
           msgNotify = 'Add new shop success';
           break;
@@ -108,6 +118,15 @@ export default {
           break;
         case UPDATE_CATEGORY:
           msgNotify = 'Update category fail';
+          break;
+        case ADD_NEW_CONFIG:
+          msgNotify = 'Add new config fail';
+          break;
+        case DELETE_CONFIG:
+          msgNotify = 'Delete config fail';
+          break;
+        case UPDATE_CONFIG:
+          msgNotify = 'Update config fail';
           break;
         case ADD_NEW_SHOP:
           msgNotify = 'Add new shop fail';

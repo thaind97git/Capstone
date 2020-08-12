@@ -25,7 +25,7 @@ export const GetCategoriesAPI = makeFetchAction(GET_CATEGORY, ({}) =>
     method: 'GET'
   })()
 );
-export const getCategories = ({}) =>
+export const getCategories = () =>
   respondToSuccess(GetCategoriesAPI.actionCreator({}), () => {});
 export const GetCategoriesDataSelector = GetCategoriesAPI.dataSelector;
 
@@ -94,18 +94,20 @@ export const getCategoryById = id =>
 export const GetCategoryByIdDataSelector = GetCategoryByIdAPI.dataSelector;
 export const GetCategoryByIdResetter = getResetter(GetCategoryByIdAPI);
 
-//Get service
-// export const GetServicesAPI = makeFetchAction(GET_SERVICE, ({}) =>
-//   nfetch({
-//     endpoint: `/services`,
-//     method: 'GET'
-//   })()
-// );
-// export const getServices = ({}) =>
-//   respondToSuccess(GetServicesAPI.actionCreator({}), () => {});
-// export const GetServicesDataSelector = GetServicesAPI.dataSelector;
+// Get service
+export const GetServicesAPI = makeFetchAction(
+  GET_SERVICE,
+  ({ page, pageSize }) =>
+    nfetch({
+      endpoint: `/getAllService?page=${page}&pageSize=${pageSize}`,
+      method: 'GET'
+    })()
+);
+export const getServices = ({ page, pageSize }) =>
+  respondToSuccess(GetServicesAPI.actionCreator({ page, pageSize }), () => {});
+export const GetServicesDataSelector = GetServicesAPI.dataSelector;
 
-// Add new Category
+// Add new Service
 export const AddNewServiceAPI = makeFetchAction(ADD_NEW_SERVICE, values =>
   nfetch({
     endpoint: '/service'
@@ -118,23 +120,6 @@ export const addNewService = values =>
 export const AddNewServiceDataSelector = AddNewServiceAPI.dataSelector;
 export const AddNewServiceErrorSelector = AddNewServiceAPI.errorSelector;
 export const AddNewServiceResetter = getResetter(AddNewServiceAPI);
-
-// Delete Category
-// export const DeleteCategoryAPI = makeFetchAction(DELETE_CATEGORY, ({ id }) =>
-//   nfetch({
-//     endpoint: `/category/${id}`,
-//     method: 'DELETE'
-//   })()
-// );
-// export const deleteCategory = id =>
-//   respondToSuccess(
-//     DeleteCategoryAPI.actionCreator({ id }),
-//     (resp, _, store) => {
-//       store.dispatch(getCategories({}));
-//     }
-//   );
-// export const DeleteCategoryDataSelector = DeleteCategoryAPI.dataSelector;
-// export const DeleteCategoryResetter = getResetter(DeleteCategoryAPI);
 
 // Update service
 export const UpdateServiceAPI = makeFetchAction(UPDATE_SERVICE, values =>

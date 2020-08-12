@@ -10,29 +10,26 @@ import FrameHeaderComponent from './FrameHeaderComponent';
 import Button from '../layouts/Button';
 import AlertDialog from '../layouts/AlertDialog';
 import {
-  GetCategoriesDataSelector,
-  getCategories,
-  AddNewCategoryDataSelector,
-  AddNewCategoryResetter,
-  DeleteCategoryResetter,
-  UpdateCategoryDataSelector,
-  UpdateCategoryResetter,
+  GetServicesDataSelector,
+  getServices,
+  DeleteServiceResetter,
   AddNewServiceDataSelector,
   UpdateServiceDataSelector,
   AddNewServiceResetter,
   UpdateServiceResetter
 } from '../stores/CategoryState';
-import CategoryActionsComponent from './CategoryActionsComponent';
 import ServiceActionComponent from './ServiceActionComponent';
+import Link from 'next/link';
+import { createLink } from '../libs';
 
 const connectWithRedux = connect(
   createStructuredSelector({
-    categoriesData: GetCategoriesDataSelector,
+    categoriesData: GetServicesDataSelector,
     addServiceSuccessMessage: AddNewServiceDataSelector,
     updateServiceData: UpdateServiceDataSelector
   }),
   dispatch => ({
-    getCategories: () => dispatch(getCategories({})),
+    getServices: (page, pageSize) => dispatch(getServices({ page, pageSize })),
     resetData: () => {
       dispatch(AddNewServiceResetter);
       dispatch(UpdateServiceResetter);
@@ -67,7 +64,15 @@ const getActions = ({ status, id, setCurrentIdSelected, setIsOpenUpdate }) => {
 const COLUMNS = [
   {
     field: 'name',
-    title: 'Category Name'
+    title: 'Service Name'
+  },
+  {
+    field: 'unit',
+    title: 'Service Unit'
+  },
+  {
+    field: 'category',
+    title: 'Category'
   },
   {
     field: 'description',
@@ -75,7 +80,7 @@ const COLUMNS = [
   },
   {
     field: 'status',
-    title: 'Category Status'
+    title: 'Service Status'
   },
   {
     field: 'actions',
@@ -89,36 +94,46 @@ const getData = ({
   setIsOpenUpdate
 }) =>
   categoriesData &&
-  categoriesData.map(({ categoryName, status, id, description }) => ({
-    name: categoryName,
-    description: description,
-    status: (
-      <Chip
-        label={status ? 'Active' : 'Disabled'}
-        clickable
-        color={!status ? 'secondary' : 'default'}
-        deleteIcon={status ? <Done /> : <Lock />}
-        style={status ? { background: 'green', color: 'white' } : {}}
-      />
-    ),
-    actions: getActions({
-      status,
-      id,
-      setCurrentIdSelected,
-      setIsOpenUpdate
-    }).map(({ label, action, icon }, index) => (
-      <ButtonActionTableComponent
-        key={index}
-        label={label}
-        action={action}
-        icon={icon}
-      />
-    ))
-  }));
+  categoriesData.map(
+    ({ serviceName, category = {}, unit, status, id, description }) => ({
+      name: serviceName,
+      unit: unit,
+      category: (
+        <Link
+          href={createLink(['category', `details?id=${(category || {}).id}`])}
+        >
+          <a>{(category || {}).categoryName}</a>
+        </Link>
+      ),
+      description: description,
+      status: (
+        <Chip
+          label={status ? 'Active' : 'Disabled'}
+          clickable
+          color={!status ? 'secondary' : 'default'}
+          deleteIcon={status ? <Done /> : <Lock />}
+          style={status ? { background: 'green', color: 'white' } : {}}
+        />
+      ),
+      actions: getActions({
+        status,
+        id,
+        setCurrentIdSelected,
+        setIsOpenUpdate
+      }).map(({ label, action, icon }, index) => (
+        <ButtonActionTableComponent
+          key={index}
+          label={label}
+          action={action}
+          icon={icon}
+        />
+      ))
+    })
+  );
 
 const ServiceManagementComponent = ({
   categoriesData,
-  getCategories,
+  getServices,
   addServiceSuccessMessage,
   resetData,
   resetAddServiceForm,
@@ -147,7 +162,7 @@ const ServiceManagementComponent = ({
     page = 0,
     pageSize = 10;
   if (categoriesData) {
-    totalCount = categoriesData.length;
+    totalCount = categoriesData.totalElements;
   }
 
   return (
@@ -181,10 +196,9 @@ const ServiceManagementComponent = ({
         <Button onClick={() => setIsOpenAdd(true)}>Add new service</Button>
       </FrameHeaderComponent>
       <ReactTableLayout
-        hasPaging={false}
-        dispatchAction={getCategories}
+        dispatchAction={getServices}
         data={getData({
-          categoriesData: categoriesData || [],
+          categoriesData: (categoriesData || {}).content || [],
           setCurrentIdSelected,
           setIsOpenUpdate
         })}

@@ -4,7 +4,7 @@ import AppBarComponent from '../components/AppBarComponent';
 import VerticalBarComponent from '../components/VerticalBarComponent';
 import CopyrightComponent from '../components/CopyrightComponent';
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex'
   },
@@ -33,9 +33,9 @@ function PageLayout({ children, title }) {
           {children}
         </Container>
         <Box style={{ backgroundColor: '#fff' }} pt={2} pb={2}>
-          <CopyrightComponent link="https://dev-blogs.netlify.com/">
+          {/* <CopyrightComponent link="https://dev-blogs.netlify.com/">
             Thaind
-          </CopyrightComponent>
+          </CopyrightComponent> */}
         </Box>
       </main>
     </div>

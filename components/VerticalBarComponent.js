@@ -28,7 +28,8 @@ import {
   ExitToApp,
   Storefront,
   DeviceHub,
-  Category
+  Category,
+  PermDataSetting
 } from '@material-ui/icons';
 import { removeToken } from '../libs/token-libs';
 
@@ -124,6 +125,11 @@ const menuStructures = [
     name: 'shop',
     label: 'Shop',
     icon: <Storefront fontSize="small" />
+  },
+  {
+    name: 'configs',
+    label: 'Configs',
+    icon: <PermDataSetting fontSize="small" />
   },
   {
     name: 'settings',

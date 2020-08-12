@@ -18,14 +18,18 @@ import {
   GetServiceByIdResetter,
   GetServiceByIdDataSelector,
   AddNewServiceErrorSelector,
-  AddNewServiceDataSelector
+  AddNewServiceDataSelector,
+  GetCategoriesDataSelector,
+  getCategories
 } from '../stores/CategoryState';
 import RenderSwitchFieldComponent from './FormFields/RenderSwitchFieldComponent';
+import RenderSelectFieldComponent from './FormFields/RenderSelectFieldComponent';
 const connectToRedux = connect(
   createStructuredSelector({
     addServiceSuccessMessage: AddNewServiceDataSelector,
     addServiceErrorMessage: AddNewServiceErrorSelector,
-    initialValues: GetServiceByIdDataSelector
+    initialValues: GetServiceByIdDataSelector,
+    categoryData: GetCategoriesDataSelector
   }),
   dispatch => ({
     onSubmit: values => {
@@ -36,9 +40,20 @@ const connectToRedux = connect(
       }
     },
     getServiceById: id => dispatch(getServiceById(id)),
-    resetData: () => dispatch(GetServiceByIdResetter)
+    resetData: () => dispatch(GetServiceByIdResetter),
+    getAllCategory: () => dispatch(getCategories())
   })
 );
+
+const getCategoryOptions = ({ categoryData = [] }) => {
+  return (
+    categoryData &&
+    categoryData.map(category => ({
+      label: category.categoryName,
+      value: category.id
+    }))
+  );
+};
 
 const withForm = reduxForm({ form: 'addNewService' });
 const enhance = compose(connectToRedux, withForm);
@@ -51,8 +66,14 @@ const ServiceActionComponent = ({
   isUpdate = false,
   id,
   getServiceById,
-  resetData
+  resetData,
+  getAllCategory,
+  categoryData
 }) => {
+  useEffect(() => {
+    getAllCategory();
+  }, [getAllCategory]);
+
   useEffect(() => {
     if (id) {
       getServiceById(id);
@@ -67,11 +88,27 @@ const ServiceActionComponent = ({
         <Grid container direction="row">
           <Field
             col={12}
-            name="categoryName"
+            name="serviceName"
             component={RenderFieldComponent}
-            placeholder="Category Name"
+            placeholder="Service Name"
             validate={[required]}
-            label="Category name"
+            label="Service name"
+          />
+          <Field
+            col={12}
+            name="unit"
+            component={RenderFieldComponent}
+            placeholder="Unit"
+            validate={[required]}
+            label="Unit"
+          />
+          <Field
+            col={6}
+            label="Category"
+            name="categoryId"
+            component={RenderSelectFieldComponent}
+            options={getCategoryOptions({ categoryData: categoryData || [] })}
+            validate={[required]}
           />
           <Field
             col={12}
