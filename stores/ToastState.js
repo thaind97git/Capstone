@@ -12,7 +12,9 @@ import {
 import {
   ADD_NEW_CATEGORY,
   DELETE_CATEGORY,
-  UPDATE_CATEGORY
+  UPDATE_CATEGORY,
+  ADD_NEW_SERVICE,
+  UPDATE_SERVICE
 } from './CategoryState';
 import { ADD_NEW_SHOP, UPDATE_SHOP } from './ShopState';
 import { ADD_NEW_CONFIG, DELETE_CONFIG, UPDATE_CONFIG } from './ConfigState';
@@ -70,6 +72,15 @@ export default {
         case UPDATE_CATEGORY:
           msgNotify = 'Update category success';
           break;
+        case ADD_NEW_SERVICE:
+          msgNotify = 'Add new service success';
+          break;
+        // case DELETE_SERVICE:
+        //   msgNotify = 'Delete service success';
+        //   break;
+        case UPDATE_SERVICE:
+          msgNotify = 'Update service success';
+          break;
         case ADD_NEW_CONFIG:
           msgNotify = 'Add new config success';
           break;
@@ -118,6 +129,15 @@ export default {
           break;
         case UPDATE_CATEGORY:
           msgNotify = 'Update category fail';
+          break;
+        case ADD_NEW_SERVICE:
+          msgNotify = 'Add new service fail';
+          break;
+        // case DELETE_SERVICE:
+        //   msgNotify = 'Delete service fail';
+        //   break;
+        case UPDATE_SERVICE:
+          msgNotify = 'Update service fail';
           break;
         case ADD_NEW_CONFIG:
           msgNotify = 'Add new config fail';

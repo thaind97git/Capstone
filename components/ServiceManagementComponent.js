@@ -16,7 +16,8 @@ import {
   AddNewServiceDataSelector,
   UpdateServiceDataSelector,
   AddNewServiceResetter,
-  UpdateServiceResetter
+  UpdateServiceResetter,
+  updateService
 } from '../stores/CategoryState';
 import ServiceActionComponent from './ServiceActionComponent';
 import Link from 'next/link';
@@ -24,7 +25,7 @@ import { createLink } from '../libs';
 
 const connectWithRedux = connect(
   createStructuredSelector({
-    categoriesData: GetServicesDataSelector,
+    servicesData: GetServicesDataSelector,
     addServiceSuccessMessage: AddNewServiceDataSelector,
     updateServiceData: UpdateServiceDataSelector
   }),
@@ -34,30 +35,56 @@ const connectWithRedux = connect(
       dispatch(AddNewServiceResetter);
       dispatch(UpdateServiceResetter);
     },
-    resetAddServiceForm: () => dispatch(reset('addNewService'))
+    resetAddServiceForm: () => dispatch(reset('addNewService')),
+    activeService: (values = {}) =>
+      dispatch(
+        updateService({
+          ...values,
+          status: true,
+          categoryId: (values.category || {}).id
+        })
+      ),
+    disableService: values =>
+      dispatch(
+        updateService({
+          ...values,
+          status: false,
+          categoryId: (values.category || {}).id
+        })
+      )
   })
 );
 
-const getActions = ({ status, id, setCurrentIdSelected, setIsOpenUpdate }) => {
+const getActions = ({
+  status,
+  id,
+  setCurrentIdSelected,
+  setIsOpenUpdate,
+  activeService,
+  disableService,
+  service
+}) => {
   return !status
     ? [
         {
-          label: 'Edit service',
-          action: () => {
-            setIsOpenUpdate(true);
-            setCurrentIdSelected(id);
-          },
-          icon: <Edit />
+          label: 'Active Service',
+          action: () => activeService(service),
+          icon: <LockOpen />
         }
       ]
     : [
         {
-          label: 'Edit service',
+          label: 'Edit Service',
           action: () => {
             setIsOpenUpdate(true);
             setCurrentIdSelected(id);
           },
           icon: <Edit />
+        },
+        {
+          label: 'Disable Service',
+          action: () => disableService(service),
+          icon: <Lock />
         }
       ];
 };
@@ -89,55 +116,63 @@ const COLUMNS = [
 ];
 
 const getData = ({
-  categoriesData = [],
+  servicesData = [],
   setCurrentIdSelected,
-  setIsOpenUpdate
+  setIsOpenUpdate,
+  activeService,
+  disableService
 }) =>
-  categoriesData &&
-  categoriesData.map(
-    ({ serviceName, category = {}, unit, status, id, description }) => ({
-      name: serviceName,
-      unit: unit,
-      category: (
-        <Link
-          href={createLink(['category', `details?id=${(category || {}).id}`])}
-        >
-          <a>{(category || {}).categoryName}</a>
-        </Link>
-      ),
-      description: description,
-      status: (
-        <Chip
-          label={status ? 'Active' : 'Disabled'}
-          clickable
-          color={!status ? 'secondary' : 'default'}
-          deleteIcon={status ? <Done /> : <Lock />}
-          style={status ? { background: 'green', color: 'white' } : {}}
-        />
-      ),
-      actions: getActions({
-        status,
-        id,
-        setCurrentIdSelected,
-        setIsOpenUpdate
-      }).map(({ label, action, icon }, index) => (
-        <ButtonActionTableComponent
-          key={index}
-          label={label}
-          action={action}
-          icon={icon}
-        />
-      ))
-    })
-  );
+  servicesData &&
+  servicesData.map(service => ({
+    name: service.serviceName,
+    unit: service.unit,
+    category: (
+      <Link
+        href={createLink([
+          'category',
+          `details?id=${(service.category || {}).id}`
+        ])}
+      >
+        <a>{(service.category || {}).categoryName}</a>
+      </Link>
+    ),
+    description: service.description,
+    status: (
+      <Chip
+        label={service.status ? 'Active' : 'Disabled'}
+        clickable
+        color={!service.status ? 'secondary' : 'default'}
+        deleteIcon={service.status ? <Done /> : <Lock />}
+        style={service.status ? { background: 'green', color: 'white' } : {}}
+      />
+    ),
+    actions: getActions({
+      status: service.status,
+      id: service.id,
+      setCurrentIdSelected,
+      setIsOpenUpdate,
+      activeService,
+      disableService,
+      service
+    }).map(({ label, action, icon }, index) => (
+      <ButtonActionTableComponent
+        key={index}
+        label={label}
+        action={action}
+        icon={icon}
+      />
+    ))
+  }));
 
 const ServiceManagementComponent = ({
-  categoriesData,
+  servicesData,
   getServices,
   addServiceSuccessMessage,
   resetData,
   resetAddServiceForm,
-  updateServiceData
+  updateServiceData,
+  activeService,
+  disableService
 }) => {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
@@ -161,8 +196,8 @@ const ServiceManagementComponent = ({
   let totalCount = 0,
     page = 0,
     pageSize = 10;
-  if (categoriesData) {
-    totalCount = categoriesData.totalElements;
+  if (servicesData) {
+    totalCount = servicesData.totalElements;
   }
 
   return (
@@ -198,9 +233,11 @@ const ServiceManagementComponent = ({
       <ReactTableLayout
         dispatchAction={getServices}
         data={getData({
-          categoriesData: (categoriesData || {}).content || [],
+          servicesData: (servicesData || {}).content || [],
           setCurrentIdSelected,
-          setIsOpenUpdate
+          setIsOpenUpdate,
+          activeService,
+          disableService
         })}
         columns={COLUMNS}
         totalCount={totalCount}

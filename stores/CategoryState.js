@@ -99,7 +99,7 @@ export const GetServicesAPI = makeFetchAction(
   GET_SERVICE,
   ({ page, pageSize }) =>
     nfetch({
-      endpoint: `/getAllService?page=${page}&pageSize=${pageSize}`,
+      endpoint: `/getAllService?page=${page}&size=${pageSize}`,
       method: 'GET'
     })()
 );
@@ -115,7 +115,7 @@ export const AddNewServiceAPI = makeFetchAction(ADD_NEW_SERVICE, values =>
 );
 export const addNewService = values =>
   respondToSuccess(AddNewServiceAPI.actionCreator(values), (resp, _, store) => {
-    // store.dispatch(getCategories({}));
+    store.dispatch(getServices({ page: 0, pageSize: 10 }));
   });
 export const AddNewServiceDataSelector = AddNewServiceAPI.dataSelector;
 export const AddNewServiceErrorSelector = AddNewServiceAPI.errorSelector;
@@ -130,7 +130,7 @@ export const UpdateServiceAPI = makeFetchAction(UPDATE_SERVICE, values =>
 );
 export const updateService = values =>
   respondToSuccess(UpdateServiceAPI.actionCreator(values), (resp, _, store) => {
-    // store.dispatch(getCategories({}));
+    store.dispatch(getServices({ page: 0, pageSize: 10 }));
   });
 export const UpdateServiceDataSelector = UpdateServiceAPI.dataSelector;
 export const UpdateServiceResetter = getResetter(UpdateServiceAPI);
