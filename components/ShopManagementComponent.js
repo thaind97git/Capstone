@@ -145,11 +145,7 @@ const getData = ({ shopsData = [], setCurrentIdSelected, setIsOpenUpdate }) =>
           <a>{shopName}</a>
         </Link>
       ),
-      owner: (
-        <Link href={createLink(['user', `details?id=${(user || {}).id}`])}>
-          <a>{(user || {}).fullName}</a>
-        </Link>
-      ),
+      owner: (user || {}).fullName,
       phoneNumber: phoneNumber,
       longtitude: longtitude,
       latitude: latitude,

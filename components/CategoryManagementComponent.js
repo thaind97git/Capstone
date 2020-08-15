@@ -3,7 +3,7 @@ import ReactTableLayout from '../layouts/SimpleTableLayout';
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Lock, LockOpen, Done, Edit } from '@material-ui/icons';
-import { Chip, Grid } from '@material-ui/core';
+import { Chip, Grid, Link } from '@material-ui/core';
 import { reset } from 'redux-form';
 import { createStructuredSelector } from 'reselect';
 import FrameHeaderComponent from './FrameHeaderComponent';
@@ -20,6 +20,8 @@ import {
   updateCategory
 } from '../stores/CategoryState';
 import CategoryActionsComponent from './CategoryActionsComponent';
+import { createLink } from '../libs';
+import DisplayShortenComponent from './commons/DisplayShotenComponent';
 
 const connectWithRedux = connect(
   createStructuredSelector({
@@ -103,8 +105,14 @@ const getData = ({
 }) =>
   categoriesData &&
   categoriesData.map(category => ({
-    name: category.categoryName,
-    description: category.description,
+    name: (
+      <Link href={createLink(['category', `details?id=${category.id}`])}>
+        <a>{category.categoryName}</a>
+      </Link>
+    ),
+    description: (
+      <DisplayShortenComponent>{category.description}</DisplayShortenComponent>
+    ),
     status: (
       <Chip
         label={category.status ? 'Active' : 'Disabled'}

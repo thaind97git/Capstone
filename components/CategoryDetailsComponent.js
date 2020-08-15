@@ -1,33 +1,30 @@
-import { compose } from 'recompose';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import React, { useEffect, useState } from 'react';
 import Router from 'next/router';
-import { upperCase } from 'lodash/fp';
 import { Typography, Grid, Divider, Link, Chip } from '@material-ui/core';
 import MissingInfoComponent from './MissingInfoComponent';
-import RatingComponent from './commons/RatingComponent';
-import ShortenContentComponent from './commons/ShortenContentComponent';
 import {
-  getShopById,
-  GetShopByIdDataSelector,
-  getServicesByShopId,
-  GetServicesByShopIdDataSelector
-} from '../stores/ShopState';
+  getCategoryById,
+  GetCategoryByIdDataSelector
+  // getServicesByCategoryId
+  // GetServicesByCategoryIdDataSelector
+} from '../stores/CategoryState';
 import { Done, Lock } from '@material-ui/icons';
 import CardSimpleLayout from '../layouts/CardSimpleLayout';
 import Button from '../layouts/Button';
 import InfoLayout from '../layouts/InforLayout';
 import ReactTableLayout from '../layouts/SimpleTableLayout';
+import DisplayShortenComponent from './commons/DisplayShotenComponent';
 
 const connectToRedux = connect(
   createStructuredSelector({
-    detailsData: GetShopByIdDataSelector,
-    servicesData: GetServicesByShopIdDataSelector
+    detailsData: GetCategoryByIdDataSelector
+    // servicesData: GetServicesByCategoryIdDataSelector
   }),
   dispatch => ({
-    getDetails: id => dispatch(getShopById(id)),
-    getServicesByShopId: shopId => dispatch(getServicesByShopId({ shopId }))
+    getDetails: id => dispatch(getCategoryById(id))
+    // getServicesByCategoryId: categoryId => dispatch(getServicesByCategoryId({ categoryId }))
   })
 );
 
@@ -46,7 +43,7 @@ const COLUMNS = [
   },
   {
     field: 'status',
-    title: 'Shop Status'
+    title: 'Category Status'
   }
 ];
 
@@ -54,7 +51,9 @@ const getData = ({ servicesData = [] }) =>
   servicesData &&
   servicesData.map(({ services = {} }) => ({
     serviceName: services.serviceName,
-    description: services.description,
+    description: (
+      <DisplayShortenComponent>{services.description}</DisplayShortenComponent>
+    ),
     unit: services.unit,
     status: (
       <Chip
@@ -67,11 +66,11 @@ const getData = ({ servicesData = [] }) =>
     )
   }));
 
-const ShopDetailsComponent = ({
+const CategoryDetailsComponent = ({
   detailsData,
   getDetails,
   servicesData,
-  getServicesByShopId
+  getServicesByCategoryId
 }) => {
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -79,40 +78,25 @@ const ShopDetailsComponent = ({
     getDetails(Router.query.id);
   }, [getDetails]);
 
-  useEffect(() => {
-    getServicesByShopId(Router.query.id);
-  }, [getServicesByShopId]);
+  // useEffect(() => {
+  //   getServicesByCategoryId(Router.query.id);
+  // }, [getServicesByCategoryId]);
 
   const rows = [
-    { label: 'Shop Name', key: 'shopName' },
-    { label: 'Phone Number', key: 'phoneNumber' },
-    { label: 'Longtitude', key: 'longtitude' },
-    { label: 'Latitude', key: 'latitude' },
-    { label: 'Rating Star', key: 'rating' },
-    { label: 'Email', key: 'email' },
-    { label: 'Address', key: 'address' },
-    { label: 'Open Time', key: 'openTime' },
-    { label: 'Close Time', key: 'closeTime' },
+    { label: 'Category Name', key: 'categoryName' },
     { label: 'Description', key: 'description' },
     { label: 'Status', key: 'status' }
   ];
   let displays = {};
   if (detailsData)
     displays = {
-      shopName: detailsData.shopName,
-      phoneNumber: detailsData.phoneNumber,
-      longtitude: detailsData.longtitude || <small>not yet defined</small>,
-      latitude: detailsData.latitude || <small>not yet defined</small>,
-      rating: <RatingComponent star={detailsData.numOfStar} /> || (
-        <small>not yet defined</small>
+      categoryName: detailsData.categoryName,
+
+      description: (
+        <DisplayShortenComponent>
+          {detailsData.description}
+        </DisplayShortenComponent>
       ),
-      email: detailsData.email || <small>not yet defined</small>,
-      address: <ShortenContentComponent content={detailsData.address} /> || (
-        <small>not yet defined</small>
-      ),
-      description: detailsData.description || <small>not yet defined</small>,
-      openTime: detailsData.openTime || <small>not yet defined</small>,
-      closeTime: detailsData.closeTime || <small>not yet defined</small>,
       status: (
         <Chip
           label={detailsData.status ? 'Active' : 'Disabled'}
@@ -129,7 +113,7 @@ const ShopDetailsComponent = ({
   return !detailsData ? (
     <MissingInfoComponent>
       <Typography variant="h5" color="secondary">
-        Not found any Shop
+        Not found any Category
       </Typography>
     </MissingInfoComponent>
   ) : (
@@ -144,21 +128,21 @@ const ShopDetailsComponent = ({
                 alignItems="center"
                 direction="row"
               >
-                <Typography variant="h6">Shop details</Typography>
+                <Typography variant="h6">Category details</Typography>
               </Grid>
             }
             body={<InfoLayout subtitle="" rows={rows} displays={displays} />}
           />
         </Grid>
       </Grid>
-      <Grid style={{ marginTop: 40 }} container justify="center">
+      {/* <Grid style={{ marginTop: 40 }} container justify="center">
         <Grid xs={12} item className="shadow-0">
           <CardSimpleLayout
             bodyStyle={{ padding: 0 }}
-            header={<Typography variant="h6">Shop services</Typography>}
+            header={<Typography variant="h6">Category services</Typography>}
             body={
               <ReactTableLayout
-                dispatchAction={() => getServicesByShopId(Router.query.id)}
+                dispatchAction={() => getServicesByCategoryId(Router.query.id)}
                 hasPaging={false}
                 data={getData({
                   servicesData: servicesData || []
@@ -168,9 +152,9 @@ const ShopDetailsComponent = ({
             }
           />
         </Grid>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };
 
-export default connectToRedux(ShopDetailsComponent);
+export default connectToRedux(CategoryDetailsComponent);

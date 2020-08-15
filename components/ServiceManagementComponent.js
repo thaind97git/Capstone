@@ -22,6 +22,7 @@ import {
 import ServiceActionComponent from './ServiceActionComponent';
 import Link from 'next/link';
 import { createLink } from '../libs';
+import DisplayShortenComponent from './commons/DisplayShotenComponent';
 
 const connectWithRedux = connect(
   createStructuredSelector({
@@ -126,17 +127,10 @@ const getData = ({
   servicesData.map(service => ({
     name: service.serviceName,
     unit: service.unit,
-    category: (
-      <Link
-        href={createLink([
-          'category',
-          `details?id=${(service.category || {}).id}`
-        ])}
-      >
-        <a>{(service.category || {}).categoryName}</a>
-      </Link>
+    category: (service.category || {}).categoryName,
+    description: (
+      <DisplayShortenComponent>{service.description}</DisplayShortenComponent>
     ),
-    description: service.description,
     status: (
       <Chip
         label={service.status ? 'Active' : 'Disabled'}

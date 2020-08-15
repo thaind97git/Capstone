@@ -12,5 +12,5 @@ export const passwordValidation = value =>
 
 export const roleName = value =>
   value && !/^ROLE_+[A-Za-z]+$/.test(value)
-    ? 'Role name must be have prefix `ROLE_`'
+    ? 'Role name must be have prefix `ROLE_{character}`'
     : undefined;

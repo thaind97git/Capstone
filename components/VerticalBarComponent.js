@@ -29,7 +29,9 @@ import {
   Storefront,
   DeviceHub,
   Category,
-  PermDataSetting
+  PermDataSetting,
+  RoomService,
+  ImportExport
 } from '@material-ui/icons';
 import { removeToken } from '../libs/token-libs';
 
@@ -109,22 +111,22 @@ const menuStructures = [
   {
     name: 'category',
     label: 'Category',
-    icon: <Category fontSize="small" />,
-    subPaths: [
-      {
-        label: 'Manage Category',
-        name: 'manage'
-      },
-      {
-        label: 'Manage Service',
-        name: 'service'
-      }
-    ]
+    icon: <Category fontSize="small" />
+  },
+  {
+    name: 'service',
+    label: 'Service',
+    icon: <RoomService fontSize="small" />
   },
   {
     name: 'shop',
     label: 'Shop',
     icon: <Storefront fontSize="small" />
+  },
+  {
+    name: 'request',
+    label: 'Request',
+    icon: <ImportExport fontSize="small" />
   },
   {
     name: 'configs',
