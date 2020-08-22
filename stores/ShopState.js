@@ -12,6 +12,13 @@ export const DELETE_SHOP = 'DELETE_SHOP';
 export const UPDATE_SHOP = 'UPDATE_SHOP';
 export const GET_SHOP_BY_ID = 'GET_SHOP_BY_ID';
 
+const GET_SHOP_OWNER = 'GET_SHOP_OWNER';
+export const ADD_NEW_SHOP_OWNER = 'ADD_NEW_SHOP_OWNER';
+export const DELETE_SHOP_OWNER = 'DELETE_SHOP_OWNER';
+export const UPDATE_SHOP_OWNER = 'UPDATE_SHOP_OWNER';
+export const GET_SHOP_OWNER_BY_ID = 'GET_SHOP_OWNER_BY_ID';
+export const GET_SHOP_BY_SHOP_OWNER_ID = 'GET_SHOP_BY_SHOP_OWNER_ID';
+
 // Service
 const GET_SERVICE = 'GET_SERVICE';
 const GET_DISTRICT = 'GET_DISTRICT';
@@ -19,6 +26,114 @@ export const ADD_NEW_SERVICE = 'ADD_NEW_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
 export const GET_SERVICE_BY_ID = 'GET_SERVICE_BY_ID';
 export const GET_SERVICES_BY_SHOP_ID = 'GET_SERVICES_BY_SHOP_ID';
+
+//Get shop
+export const GetShopOwnersAPI = makeFetchAction(
+  GET_SHOP_OWNER,
+  ({ page, pageSize }) =>
+    nfetch({
+      endpoint: `/admin/shopOwner/page?page=${page}&size=${pageSize}`,
+      method: 'GET'
+    })()
+);
+export const getShopOwners = ({ page, pageSize }) =>
+  respondToSuccess(
+    GetShopOwnersAPI.actionCreator({ page, pageSize }),
+    () => {}
+  );
+export const GetShopOwnersDataSelector = GetShopOwnersAPI.dataSelector;
+
+// Add new Shop
+export const AddNewShopOwnerAPI = makeFetchAction(
+  ADD_NEW_SHOP_OWNER,
+  values => {
+    return nfetch({
+      endpoint: '/api/users/registerShopOwner'
+    })(values);
+  }
+);
+export const addNewShopOwner = values =>
+  respondToSuccess(
+    AddNewShopOwnerAPI.actionCreator(values),
+    (resp, _, store) => {
+      store.dispatch(getShopOwners({ page: 0, pageSize: 10 }));
+    }
+  );
+export const AddNewShopOwnerDataSelector = AddNewShopOwnerAPI.dataSelector;
+export const AddNewShopOwnerErrorSelector = AddNewShopOwnerAPI.errorSelector;
+export const AddNewShopOwnerResetter = getResetter(AddNewShopOwnerAPI);
+
+// Delete Shop
+export const DeleteShopOwnerAPI = makeFetchAction(DELETE_SHOP_OWNER, ({ id }) =>
+  nfetch({
+    endpoint: `/shop/${id}`,
+    method: 'DELETE'
+  })()
+);
+export const deleteShopOwner = id =>
+  respondToSuccess(
+    DeleteShopOwnerAPI.actionCreator({ id }),
+    (resp, _, store) => {
+      store.dispatch(getShopOwners({}));
+    }
+  );
+export const DeleteShopOwnerDataSelector = DeleteShopOwnerAPI.dataSelector;
+export const DeleteShopOwnerResetter = getResetter(DeleteShopOwnerAPI);
+
+// Update Shop
+export const UpdateShopOwnerAPI = makeFetchAction(UPDATE_SHOP_OWNER, values =>
+  nfetch({
+    endpoint: `/api/updateShopOwner/${values.id}`,
+    method: 'PUT'
+  })(values)
+);
+export const updateShopOwner = values => {
+  return respondToSuccess(
+    UpdateShopOwnerAPI.actionCreator({
+      ...values,
+      status: values.status === true ? 4 : 0
+    }),
+    (resp, _, store) => {
+      store.dispatch(getShopOwners({ page: 0, pageSize: 10 }));
+    }
+  );
+};
+export const UpdateShopOwnerDataSelector = UpdateShopOwnerAPI.dataSelector;
+export const UpdateShopOwnerResetter = getResetter(UpdateShopOwnerAPI);
+
+// Get Shop by id
+export const GetShopOwnerByIdAPI = makeFetchAction(
+  GET_SHOP_OWNER_BY_ID,
+  ({ id }) =>
+    nfetch({
+      endpoint: `/admin/users/${id}`,
+      method: 'GET'
+    })()
+);
+export const getShopOwnerById = id =>
+  respondToSuccess(GetShopOwnerByIdAPI.actionCreator({ id }), () => {});
+export const GetShopOwnerByIdDataSelector = GetShopOwnerByIdAPI.dataSelector;
+export const GetShopOwnerByIdResetter = getResetter(GetShopOwnerByIdAPI);
+
+// Get Shop by Shop Owner id
+export const GetShopByShopOwnerIdAPI = makeFetchAction(
+  GET_SHOP_BY_SHOP_OWNER_ID,
+  ({ id, page, pageSize }) =>
+    nfetch({
+      endpoint: `/shop/shops/filter?id=${id}&page=${page}&size=${pageSize}`,
+      method: 'GET'
+    })()
+);
+export const getShopByShopOwnerId = ({ id, page, pageSize }) =>
+  respondToSuccess(
+    GetShopByShopOwnerIdAPI.actionCreator({ id, page, pageSize }),
+    () => {}
+  );
+export const GetShopByShopOwnerIdDataSelector =
+  GetShopByShopOwnerIdAPI.dataSelector;
+export const GetShopByShopOwnerIdResetter = getResetter(
+  GetShopByShopOwnerIdAPI
+);
 
 //Get shop
 export const GetShopsAPI = makeFetchAction(GET_SHOP, ({ page, pageSize }) =>

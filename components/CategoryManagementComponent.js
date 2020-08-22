@@ -83,10 +83,6 @@ const COLUMNS = [
     title: 'Category Name'
   },
   {
-    field: 'description',
-    title: 'Description'
-  },
-  {
     field: 'status',
     title: 'Category Status'
   },

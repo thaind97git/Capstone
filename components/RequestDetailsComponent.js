@@ -36,9 +36,7 @@ const REQUEST_SHOP_SERVICES_COLUMN = [
   { field: 'serviceName', title: 'Service Name' },
   { field: 'unit', title: 'Service Unit' },
   { field: 'category', title: 'Category' },
-  { field: 'price', title: 'Price' },
-  { field: 'serviceDescription', title: 'Service Description' },
-  { field: 'shopServiceDescription', title: 'Shop Service Description' }
+  { field: 'price', title: 'Price' }
 ];
 
 const getData = ({ detailsData = {} }) => {
@@ -78,22 +76,22 @@ const RequestDetailsComponent = ({ detailsData, getDetails }) => {
 
   const rows = [
     { key: 'code', label: 'Request Code' },
-    { key: 'userCreated', label: 'User Created' },
+    { key: 'userCreated', label: 'Biker' },
     { key: 'createdAt', label: 'Time Created' },
-    { key: 'userAccepted', label: 'User Accepted' },
+    { key: 'userAccepted', label: 'Shop Owner' },
     { key: 'acceptedAt', label: 'Time Accepted' },
     { key: 'vehicle', label: 'Vehicle' },
-    { key: 'longtitude', label: 'Longtitude' },
-    { key: 'latitude', label: 'Latitude' },
+    // { key: 'latitude', label: 'Latitude' },
     { key: 'reviewComment', label: 'Review Comment' },
     { key: 'reviewRating', label: 'Review Rating' },
     { key: 'price', label: 'Price' },
     { key: 'address', label: 'Address' },
-    { key: 'description', label: 'Description' },
+    { key: 'cancelReason', label: 'Cancel Reason' },
     { key: 'status', label: 'Request Status' }
   ];
   let displays = {};
-  if (detailsData)
+  if (detailsData) {
+    console.log({ detailsData });
     displays = {
       code: <a>{detailsData.code}</a>,
       userCreated: (detailsData.created || {}).fullName,
@@ -103,18 +101,14 @@ const RequestDetailsComponent = ({ detailsData, getDetails }) => {
       userAccepted: (
         <Link
           href={createLink([
-            'shop',
+            'shop-owner',
             `details?id=${(detailsData.accepted || {}).id}`
           ])}
         >
           <a>{(detailsData.accepted || {}).fullName}</a>
         </Link>
       ),
-      acceptedAt: (
-        <Moment format={DATE_TIME_FORMAT}>
-          {(detailsData.accepted || {}).createdTime}
-        </Moment>
-      ),
+      acceptedAt: (detailsData.accepted || {}).createdTime,
       longtitude: detailsData.longtitude,
       latitude: detailsData.latitude,
       price: detailsData.price.toLocaleString('it-IT', {
@@ -125,14 +119,16 @@ const RequestDetailsComponent = ({ detailsData, getDetails }) => {
       reviewComment: detailsData.reviewComment,
       reviewRating: <RatingComponent star={detailsData.reviewRating} />,
       cancelReason: detailsData.cancelReason,
-      address: <ShortenContentComponent content={detailsData.address} />,
+      address: detailsData.address,
       description: (
         <DisplayShortenComponent>
           {detailsData.description}
         </DisplayShortenComponent>
       ),
+      cancelReason: detailsData.cancelReason,
       status: <RequestStatusComponent status={detailsData.status} />
     };
+  }
 
   return !detailsData ? (
     <MissingInfoComponent>

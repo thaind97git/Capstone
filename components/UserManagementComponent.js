@@ -2,63 +2,62 @@ import ButtonActionTableComponent from './commons/ButtonActionTableComponent';
 import ReactTableLayout from '../layouts/SimpleTableLayout';
 import React, { useState, useEffect } from 'react';
 import { connect } from 'react-redux';
-import { Lock, LockOpen, Done } from '@material-ui/icons';
+import { Lock, LockOpen, Done, Edit } from '@material-ui/icons';
 import { Chip, Grid } from '@material-ui/core';
 import { reset } from 'redux-form';
-import {
-  GetRolesDataSelector,
-  getRoles,
-  addNewRole,
-  AddNewRoleDataSelector,
-  AddNewRoleErrorSelector,
-  AddNewRoleResetter
-} from '../stores/RoleState';
 import { createStructuredSelector } from 'reselect';
 import FrameHeaderComponent from './FrameHeaderComponent';
 import Button from '../layouts/Button';
 import AlertDialog from '../layouts/AlertDialog';
-import RoleAddingComponent from './RoleAddingComponent';
+import UserActionsComponent from './UserActionsComponent';
 import {
   getUsers,
   GetUsersDataSelector,
   banUser,
-  unbBanUser
+  unbBanUser,
+  AddNewUserResetter,
+  AddNewUserDataSelector,
+  AddNewUserErrorSelector,
+  UpdateUserDataSelector,
+  UpdateUserResetter
 } from '../stores/userState';
 import AvatarComponent from './AvatarComponent';
 import DisplayShortenComponent from './commons/DisplayShotenComponent';
 
 const connectWithRedux = connect(
   createStructuredSelector({
-    usersData: GetUsersDataSelector
-    // addRoleSuccessMessage: AddNewRoleDataSelector,
-    // addRoleErrorMessage: AddNewRoleErrorSelector
+    usersData: GetUsersDataSelector,
+    addUserSuccessMessage: AddNewUserDataSelector,
+    addUserErrorMessage: AddNewUserErrorSelector,
+    updateUserSuccessMessage: UpdateUserDataSelector
   }),
   dispatch => ({
     getUsers: (page, size) => dispatch(getUsers({ page, size })),
     banUser: id => dispatch(banUser(id)),
-    unBanUser: id => dispatch(unbBanUser(id))
-    // addNewUser: name => dispatch(addNewRole(name)),
-    // resetData: () => dispatch(AddNewRoleResetter),
-    // resetAddRoleForm: () => dispatch(reset('addNewRole'))
+    unBanUser: id => dispatch(unbBanUser(id)),
+    resetData: () => {
+      dispatch(AddNewUserResetter);
+      dispatch(UpdateUserResetter);
+    },
+    resetAddUserForm: () => dispatch(reset('addNewUser'))
   })
 );
 
-const getMemberManagementActions = ({ enabled, id, banUser, unBanUser }) => {
-  return !enabled
-    ? [
-        {
-          label: 'Active User',
-          action: () => unBanUser(id),
-          icon: <LockOpen />
-        }
-      ]
-    : [
-        {
-          label: 'Disable User',
-          action: () => banUser(id),
-          icon: <Lock />
-        }
-      ];
+const getMemberManagementActions = ({
+  id,
+  setCurrentIdSelected,
+  setIsOpenUpdate
+}) => {
+  return [
+    {
+      label: 'Edit User',
+      action: () => {
+        setIsOpenUpdate(true);
+        setCurrentIdSelected(id);
+      },
+      icon: <Edit />
+    }
+  ];
 };
 const COLUMNS = [
   {
@@ -77,18 +76,7 @@ const COLUMNS = [
     field: 'phoneNumber',
     title: 'Phone'
   },
-  {
-    field: 'address',
-    title: 'Address'
-  },
-  {
-    field: 'latitude',
-    title: 'Latitude'
-  },
-  {
-    field: 'longtitude',
-    title: 'Longtitude'
-  },
+
   {
     field: 'createTime',
     title: 'Date Created'
@@ -103,28 +91,14 @@ const COLUMNS = [
   }
 ];
 
-const getData = (roles = [], banUser, unBanUser) =>
-  roles &&
-  roles.map(
-    ({
-      id,
-      address,
-      avtUrl,
-      createdTime,
-      email,
-      status: enabled,
-      fullName,
-      latitude,
-      longtitude,
-      phoneNumber
-    }) => ({
+const getData = (userData = [], setCurrentIdSelected, setIsOpenUpdate) =>
+  userData &&
+  userData.map(
+    ({ id, avtUrl, email, status: enabled, fullName, phoneNumber }) => ({
       avatar: <AvatarComponent small url={avtUrl} />,
       fullName: fullName,
       email: email,
       phoneNumber: phoneNumber,
-      address: <DisplayShortenComponent>{address}</DisplayShortenComponent>,
-      latitude: latitude,
-      longtitude: longtitude,
       createTime: fullName,
       status: (
         <Chip
@@ -136,10 +110,9 @@ const getData = (roles = [], banUser, unBanUser) =>
         />
       ),
       actions: getMemberManagementActions({
-        enabled,
         id,
-        banUser,
-        unBanUser
+        setCurrentIdSelected,
+        setIsOpenUpdate
       }).map(({ label, action, icon }, index) => (
         <ButtonActionTableComponent
           key={index}
@@ -154,23 +127,28 @@ const getData = (roles = [], banUser, unBanUser) =>
 const UserManagementComponent = ({
   usersData,
   getUsers,
-  banUser,
-  unBanUser
-  // addNewRole,
-  // addRoleSuccessMessage,
-  // resetData,
-  // resetAddRoleForm
+  addUserSuccessMessage,
+  resetData,
+  resetAddUserForm,
+  updateUserSuccessMessage
 }) => {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
+  const [currentIdSelected, setCurrentIdSelected] = useState(null);
+  useEffect(() => {
+    if (addUserSuccessMessage) {
+      setIsOpenAdd(false);
+      resetData();
+      resetAddUserForm();
+    }
+  }, [addUserSuccessMessage]);
 
-  // useEffect(() => {
-  //   if (addRoleSuccessMessage) {
-  //     setIsOpenAdd(false);
-  //     resetData();
-  //     resetAddRoleForm();
-  //   }
-  // }, [addRoleSuccessMessage]);
+  useEffect(() => {
+    if (updateUserSuccessMessage) {
+      setIsOpenUpdate(false);
+      resetData();
+    }
+  }, [updateUserSuccessMessage]);
 
   let totalCount = 0,
     page = 0,
@@ -181,21 +159,41 @@ const UserManagementComponent = ({
 
   return (
     <React.Fragment>
-      {/* <AlertDialog
-        title="Add new role"
+      <AlertDialog
+        title="Add new user"
         isOpenDialog={isOpenAdd}
         setIsOpenDialog={setIsOpenAdd}
         isFooter={false}
-        size="xs"
+        size="md"
         fullWidth
-        content={<RoleAddingComponent />}
-      /> */}
+        content={<UserActionsComponent />}
+      />
+      <AlertDialog
+        title="Update User"
+        isOpenDialog={isOpenUpdate}
+        setIsOpenDialog={setIsOpenUpdate}
+        isFooter={false}
+        size="md"
+        fullWidth
+        content={
+          isOpenUpdate ? (
+            <UserActionsComponent isUpdate id={currentIdSelected} />
+          ) : null
+        }
+        onClose={() => {
+          setIsOpenUpdate(false);
+        }}
+      />
       <FrameHeaderComponent title="User management">
-        {/* <Button onClick={() => setIsOpenAdd(true)}>Add new user</Button> */}
+        <Button onClick={() => setIsOpenAdd(true)}>Add new user</Button>
       </FrameHeaderComponent>
       <ReactTableLayout
         dispatchAction={getUsers}
-        data={getData((usersData || {}).content, banUser, unBanUser)}
+        data={getData(
+          (usersData || {}).content,
+          setCurrentIdSelected,
+          setIsOpenUpdate
+        )}
         columns={COLUMNS}
         totalCount={totalCount}
         page={page}

@@ -17,21 +17,27 @@ import {
   UpdateServiceDataSelector,
   AddNewServiceResetter,
   UpdateServiceResetter,
-  updateService
+  updateService,
+  getCategories,
+  GetCategoriesDataSelector,
+  getServiceByCategoryId,
+  GetServiceByCategoryIdDataSelector
 } from '../stores/CategoryState';
 import ServiceActionComponent from './ServiceActionComponent';
 import Link from 'next/link';
 import { createLink } from '../libs';
 import DisplayShortenComponent from './commons/DisplayShotenComponent';
+import SelectLayout from '../layouts/SelectLayout';
 
 const connectWithRedux = connect(
   createStructuredSelector({
-    servicesData: GetServicesDataSelector,
+    servicesData: GetServiceByCategoryIdDataSelector,
     addServiceSuccessMessage: AddNewServiceDataSelector,
-    updateServiceData: UpdateServiceDataSelector
+    updateServiceData: UpdateServiceDataSelector,
+    categoryData: GetCategoriesDataSelector
   }),
   dispatch => ({
-    getServices: (page, pageSize) => dispatch(getServices({ page, pageSize })),
+    getServices: id => dispatch(getServiceByCategoryId(id)),
     resetData: () => {
       dispatch(AddNewServiceResetter);
       dispatch(UpdateServiceResetter);
@@ -52,7 +58,8 @@ const connectWithRedux = connect(
           status: false,
           categoryId: (values.category || {}).id
         })
-      )
+      ),
+    getAllCategory: () => dispatch(getCategories())
   })
 );
 
@@ -89,6 +96,7 @@ const getActions = ({
         }
       ];
 };
+
 const COLUMNS = [
   {
     field: 'name',
@@ -97,14 +105,6 @@ const COLUMNS = [
   {
     field: 'unit',
     title: 'Service Unit'
-  },
-  {
-    field: 'category',
-    title: 'Category'
-  },
-  {
-    field: 'description',
-    title: 'Description'
   },
   {
     field: 'status',
@@ -166,11 +166,29 @@ const ServiceManagementComponent = ({
   resetAddServiceForm,
   updateServiceData,
   activeService,
-  disableService
+  disableService,
+  getAllCategory,
+  categoryData
 }) => {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
   const [currentIdSelected, setCurrentIdSelected] = useState(null);
+  const [categoryId, setCategoryId] = useState(null);
+
+  useEffect(() => {
+    getAllCategory();
+  }, [getAllCategory]);
+
+  useEffect(() => {
+    if (!!categoryData) {
+      setCategoryId(categoryData[0].id);
+      localStorage.setItem('_category_id_with_service', categoryData[0].id);
+    }
+  }, [categoryData]);
+
+  useEffect(() => {
+    getServices(categoryId);
+  }, [categoryId]);
 
   useEffect(() => {
     if (addServiceSuccessMessage) {
@@ -186,6 +204,14 @@ const ServiceManagementComponent = ({
       resetData();
     }
   }, [updateServiceData]);
+
+  let selectOptions = [];
+  if (categoryData) {
+    selectOptions = categoryData.map(category => ({
+      value: category.id,
+      label: category.categoryName
+    }));
+  }
 
   let totalCount = 0,
     page = 0,
@@ -203,7 +229,11 @@ const ServiceManagementComponent = ({
         isFooter={false}
         size="xs"
         fullWidth
-        content={isOpenAdd ? <ServiceActionComponent /> : null}
+        content={
+          isOpenAdd ? (
+            <ServiceActionComponent categoryData={categoryData || []} />
+          ) : null
+        }
       />
       <AlertDialog
         title="Update service"
@@ -214,7 +244,11 @@ const ServiceManagementComponent = ({
         fullWidth
         content={
           isOpenUpdate ? (
-            <ServiceActionComponent isUpdate id={currentIdSelected} />
+            <ServiceActionComponent
+              categoryData={categoryData || []}
+              isUpdate
+              id={currentIdSelected}
+            />
           ) : null
         }
         onClose={() => {
@@ -222,12 +256,30 @@ const ServiceManagementComponent = ({
         }}
       />
       <FrameHeaderComponent title="Service management">
-        <Button onClick={() => setIsOpenAdd(true)}>Add new service</Button>
+        <div>
+          <Grid container alignItems="center">
+            Filter by category:{' '}
+            <SelectLayout
+              onChange={event => {
+                localStorage.setItem(
+                  '_category_id_with_service',
+                  event.target.value
+                );
+                setCategoryId(event.target.value);
+              }}
+              value={categoryId}
+              options={selectOptions}
+            />{' '}
+            <Button onClick={() => setIsOpenAdd(true)}>Add new service</Button>
+          </Grid>
+        </div>
       </FrameHeaderComponent>
       <ReactTableLayout
+        hasPaging={false}
+        dispatchExCondition={[categoryId]}
         dispatchAction={getServices}
         data={getData({
-          servicesData: (servicesData || {}).content || [],
+          servicesData: servicesData || [],
           setCurrentIdSelected,
           setIsOpenUpdate,
           activeService,

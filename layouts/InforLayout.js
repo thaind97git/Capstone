@@ -1,10 +1,18 @@
 import React from 'react';
-import { Grid, makeStyles } from '@material-ui/core';
+import { Grid, makeStyles, TextField, ListItemText } from '@material-ui/core';
 
 const InfoRow = ({ display, classes }) => (
-  <span className={classes.text}>
-    {typeof display === 'function' ? display() : display}
-  </span>
+  // <TextField
+  //   InputProps={{
+  //     readOnly: true
+  //   }}
+  //   // label={typeof display === 'function' ? display() : display}
+  //   defaultValue={typeof display === 'function' ? display() : display}
+  // />
+  <ListItemText primary={typeof display === 'function' ? display() : display} />
+  // <span className={classes.text}>
+  //   {typeof display === 'function' ? display() : display}
+  // </span>
 );
 
 const useStyles = makeStyles(theme => ({
@@ -18,7 +26,7 @@ const InfoLayout = ({ rows, displays, children }) => {
   return (
     <Grid container spacing={3}>
       {rows.map((row, index) => (
-        <Grid item xs={12} sm={6} md={4} key={index}>
+        <Grid item xs={12} md={12} lg={6} key={index}>
           <Grid container direction="column">
             <span className={classes.label}>{row.label}</span>
             <InfoRow

@@ -58,11 +58,11 @@ const COLUMNS = [
   {
     field: 'status',
     title: 'Role Status'
-  },
-  {
-    field: 'actions',
-    title: 'Actions'
   }
+  // {
+  //   field: 'actions',
+  //   title: 'Actions'
+  // }
 ];
 
 const getData = (roles = []) =>
@@ -118,7 +118,7 @@ const RoleManagementComponent = ({
 
   return (
     <React.Fragment>
-      <AlertDialog
+      {/* <AlertDialog
         title="Add new role"
         isOpenDialog={isOpenAdd}
         setIsOpenDialog={setIsOpenAdd}
@@ -126,9 +126,9 @@ const RoleManagementComponent = ({
         size="xs"
         fullWidth
         content={<RoleAddingComponent />}
-      />
+      /> */}
       <FrameHeaderComponent title="Role management">
-        <Button onClick={() => setIsOpenAdd(true)}>Add new role</Button>
+        {/* <Button onClick={() => setIsOpenAdd(true)}>Add new role</Button> */}
       </FrameHeaderComponent>
       <ReactTableLayout
         dispatchAction={getRoles}

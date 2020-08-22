@@ -31,7 +31,8 @@ import {
   Category,
   PermDataSetting,
   RoomService,
-  ImportExport
+  ImportExport,
+  Message
 } from '@material-ui/icons';
 import { removeToken } from '../libs/token-libs';
 
@@ -99,8 +100,8 @@ const menuStructures = [
     icon: <DesktopMac fontSize="small" />
   },
   {
-    name: 'user',
-    label: 'User',
+    name: 'biker',
+    label: 'Biker',
     icon: <AccountCircle fontSize="small" />
   },
   {
@@ -119,8 +120,8 @@ const menuStructures = [
     icon: <RoomService fontSize="small" />
   },
   {
-    name: 'shop',
-    label: 'Shop',
+    name: 'shop-owner',
+    label: 'Shop Owner',
     icon: <Storefront fontSize="small" />
   },
   {
@@ -134,9 +135,9 @@ const menuStructures = [
     icon: <PermDataSetting fontSize="small" />
   },
   {
-    name: 'settings',
-    label: 'Settings',
-    icon: <Settings fontSize="small" />
+    name: 'feedback',
+    label: 'Feedback',
+    icon: <Message fontSize="small" />
   },
   {
     label: 'Logout',
@@ -189,7 +190,7 @@ function VerticalBarComponent(props) {
       >
         <Grid container justify="center" alignItems="center" direction="row">
           <Link href="/">
-            <div className={classes.title}>Title Here</div>
+            <div className={classes.title}>Bike Rescue</div>
           </Link>
           {showSidebar && (
             <IconButton onClick={() => sidebarToggle(false)}>

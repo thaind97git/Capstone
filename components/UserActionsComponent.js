@@ -12,60 +12,57 @@ import { required, emailValidation } from '../utils/validation';
 import RenderSwitchFieldComponent from './FormFields/RenderSwitchFieldComponent';
 import RenderTimePickerFieldComponent from './FormFields/RenderTimePickerFieldComponent';
 import {
-  addNewShop,
-  getShopById,
-  GetShopByIdResetter,
-  GetShopByIdDataSelector,
-  updateShop,
-  getDistricts,
-  GetDistrictsDataSelector,
-  addNewShopOwner,
-  getShopOwnerById,
-  GetShopOwnerByIdDataSelector,
-  updateShopOwner,
-  GetShopOwnerByIdResetter
-} from '../stores/ShopState';
+  addNewUser,
+  getUserById,
+  GetUserByIdResetter,
+  GetUserByIdDataSelector,
+  updateUser,
+  AddNewUserResetter
+  // updateUser
+} from '../stores/userState';
+import { getDistricts, GetDistrictsDataSelector } from '../stores/ShopState';
 import { formatAMPM } from '../utils';
 import RenderImageFieldComponent from './FormFields/RenderImageFieldComponent';
-import RenderSelectFieldComponent from './FormFields/RenderSelectFieldComponent';
 import { getUserID } from '../libs/user-libs';
 const connectToRedux = connect(
   createStructuredSelector({
-    initialValues: GetShopOwnerByIdDataSelector,
+    initialValues: GetUserByIdDataSelector,
     districtData: GetDistrictsDataSelector
   }),
   dispatch => ({
     onSubmit: values => {
       if ('status' in values) {
-        dispatch(updateShopOwner(values));
+        dispatch(updateUser(values));
       } else {
-        dispatch(addNewShopOwner(values));
+        dispatch(addNewUser(values));
       }
     },
-    getShopById: id => dispatch(getShopOwnerById(id)),
-    resetData: () => {
-      dispatch(GetShopOwnerByIdResetter);
+    getUserById: id => {
+      dispatch(getUserById(id));
     },
-    getAllDistrict: () => dispatch(getDistricts())
+    resetData: () => {
+      dispatch(AddNewUserResetter);
+      dispatch(GetUserByIdResetter);
+    }
   })
 );
 
-const withForm = reduxForm({ form: 'addNewShop' });
+const withForm = reduxForm({ form: 'addNewUser' });
 const enhance = compose(connectToRedux, withForm);
 
-const ShopActionComponent = ({
+const UserActionComponent = ({
   handleSubmit,
   pristine,
   submitting,
   reset,
   isUpdate = false,
   id,
-  getShopById,
+  getUserById,
   resetData
 }) => {
   useEffect(() => {
     if (id) {
-      getShopById(id);
+      getUserById(id);
     }
     return () => {
       resetData();
@@ -153,4 +150,4 @@ const ShopActionComponent = ({
   );
 };
 
-export default enhance(ShopActionComponent);
+export default enhance(UserActionComponent);

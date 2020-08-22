@@ -34,11 +34,11 @@ const connectWithRedux = connect(
 const COLUMNS = [
   {
     field: 'code',
-    title: 'Request Code'
+    title: 'Code'
   },
   {
     field: 'userCreated',
-    title: 'User Created'
+    title: 'Biker'
   },
   {
     field: 'createdAt',
@@ -46,31 +46,15 @@ const COLUMNS = [
   },
   {
     field: 'userAccepted',
-    title: 'User Accepted'
+    title: 'Shop Owner'
   },
   {
     field: 'acceptedAt',
     title: 'Time Accepted'
   },
   {
-    field: 'longtitude',
-    title: 'Longtitude'
-  },
-  {
-    field: 'latitude',
-    title: 'Latitude'
-  },
-  {
-    field: 'price',
-    title: 'Price'
-  },
-  {
-    field: 'address',
-    title: 'Address'
-  },
-  {
     field: 'status',
-    title: 'Request Status'
+    title: 'Status'
   }
 ];
 
@@ -86,7 +70,10 @@ const getData = ({ requestsData = [] }) =>
     createdAt: <Moment format={DATE_TIME_FORMAT}>{request.createdDate}</Moment>,
     userAccepted: (
       <Link
-        href={createLink(['shop', `details?id=${(request.accepted || {}).id}`])}
+        href={createLink([
+          'shop-owner',
+          `details?id=${(request.accepted || {}).id}`
+        ])}
       >
         <a>{(request.accepted || {}).fullName}</a>
       </Link>

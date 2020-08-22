@@ -28,8 +28,8 @@ const connectToRedux = connect(
   createStructuredSelector({
     addServiceSuccessMessage: AddNewServiceDataSelector,
     addServiceErrorMessage: AddNewServiceErrorSelector,
-    initialValues: GetServiceByIdDataSelector,
-    categoryData: GetCategoriesDataSelector
+    initialValues: GetServiceByIdDataSelector
+    // categoryData: GetCategoriesDataSelector
   }),
   dispatch => ({
     onSubmit: values => {
@@ -70,9 +70,9 @@ const ServiceActionComponent = ({
   getAllCategory,
   categoryData
 }) => {
-  useEffect(() => {
-    getAllCategory();
-  }, [getAllCategory]);
+  // useEffect(() => {
+  //   getAllCategory();
+  // }, [getAllCategory]);
 
   useEffect(() => {
     if (id) {

@@ -17,6 +17,7 @@ const GET_SERVICE = 'GET_SERVICE';
 export const ADD_NEW_SERVICE = 'ADD_NEW_SERVICE';
 export const UPDATE_SERVICE = 'UPDATE_SERVICE';
 export const GET_SERVICE_BY_ID = 'GET_SERVICE_BY_ID';
+const GET_SERVICE_BY_CATEGORY_ID = 'GET_SERVICE_BY_CATEGORY_ID';
 
 //Get category
 export const GetCategoriesAPI = makeFetchAction(GET_CATEGORY, ({}) =>
@@ -80,6 +81,23 @@ export const updateCategory = values =>
 export const UpdateCategoryDataSelector = UpdateCategoryAPI.dataSelector;
 export const UpdateCategoryResetter = getResetter(UpdateCategoryAPI);
 
+// Get Service by Category Id
+export const GetServiceByCategoryIdAPI = makeFetchAction(
+  GET_CATEGORY_BY_ID,
+  ({ id }) =>
+    nfetch({
+      endpoint: `/serviceByCategoryId/${id}`,
+      method: 'GET'
+    })()
+);
+export const getServiceByCategoryId = id =>
+  respondToSuccess(GetServiceByCategoryIdAPI.actionCreator({ id }), () => {});
+export const GetServiceByCategoryIdDataSelector =
+  GetServiceByCategoryIdAPI.dataSelector;
+export const GetServiceByCategoryIdResetter = getResetter(
+  GetServiceByCategoryIdAPI
+);
+
 // Get Category by id
 export const GetCategoryByIdAPI = makeFetchAction(
   GET_CATEGORY_BY_ID,
@@ -115,7 +133,9 @@ export const AddNewServiceAPI = makeFetchAction(ADD_NEW_SERVICE, values =>
 );
 export const addNewService = values =>
   respondToSuccess(AddNewServiceAPI.actionCreator(values), (resp, _, store) => {
-    store.dispatch(getServices({ page: 0, pageSize: 10 }));
+    store.dispatch(
+      getServiceByCategoryId(localStorage.getItem('_category_id_with_service'))
+    );
   });
 export const AddNewServiceDataSelector = AddNewServiceAPI.dataSelector;
 export const AddNewServiceErrorSelector = AddNewServiceAPI.errorSelector;
@@ -130,7 +150,9 @@ export const UpdateServiceAPI = makeFetchAction(UPDATE_SERVICE, values =>
 );
 export const updateService = values =>
   respondToSuccess(UpdateServiceAPI.actionCreator(values), (resp, _, store) => {
-    store.dispatch(getServices({ page: 0, pageSize: 10 }));
+    store.dispatch(
+      getServiceByCategoryId(localStorage.getItem('_category_id_with_service'))
+    );
   });
 export const UpdateServiceDataSelector = UpdateServiceAPI.dataSelector;
 export const UpdateServiceResetter = getResetter(UpdateServiceAPI);

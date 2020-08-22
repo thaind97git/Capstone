@@ -1,6 +1,11 @@
 import { merge, get } from 'lodash/fp';
 import { ACTIONS } from 'redux-api-call';
-import { LOGIN_USER, UPDATE_USER_STATUS } from './userState';
+import {
+  LOGIN_USER,
+  UPDATE_USER_STATUS,
+  ADD_NEW_USER,
+  UPDATE_USER
+} from './userState';
 import { ADD_NEW_ROLE } from './RoleState';
 import { DEFAULT_OPTION_TOAST } from '../utils/options';
 import {
@@ -16,7 +21,12 @@ import {
   ADD_NEW_SERVICE,
   UPDATE_SERVICE
 } from './CategoryState';
-import { ADD_NEW_SHOP, UPDATE_SHOP } from './ShopState';
+import {
+  ADD_NEW_SHOP,
+  UPDATE_SHOP,
+  ADD_NEW_SHOP_OWNER,
+  UPDATE_SHOP_OWNER
+} from './ShopState';
 import { ADD_NEW_CONFIG, DELETE_CONFIG, UPDATE_CONFIG } from './ConfigState';
 export const ENQUEUE_SNACKBAR = 'ENQUEUE_SNACKBAR';
 export const REMOVE_TOAST = 'REMOVE_TOAST';
@@ -62,6 +72,18 @@ export default {
           break;
         case ADD_NEW_ROLE:
           msgNotify = 'Add new role success';
+          break;
+        case ADD_NEW_USER:
+          msgNotify = 'Add new user success';
+          break;
+        case UPDATE_USER:
+          msgNotify = 'update user success';
+          break;
+        case ADD_NEW_SHOP_OWNER:
+          msgNotify = 'Add new shop owner success';
+          break;
+        case UPDATE_SHOP_OWNER:
+          msgNotify = 'Update shop owner success';
           break;
         case ADD_NEW_CATEGORY:
           msgNotify = 'Add new category success';
@@ -120,6 +142,18 @@ export default {
           break;
         case ADD_NEW_ROLE:
           msgNotify = 'Add new role fail';
+          break;
+        case ADD_NEW_USER:
+          msgNotify = get('json.message')(payload) || 'Add new user fail';
+          break;
+        case UPDATE_USER:
+          msgNotify = 'update user fail';
+          break;
+        case ADD_NEW_SHOP_OWNER:
+          msgNotify = get('json.message')(payload) || 'Add new shop owner fail';
+          break;
+        case UPDATE_SHOP_OWNER:
+          msgNotify = 'Update shop owner fail';
           break;
         case ADD_NEW_CATEGORY:
           msgNotify = 'Add new category fail';

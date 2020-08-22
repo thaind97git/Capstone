@@ -89,6 +89,7 @@ const ReactTableLayout = ({
   searchProps = {},
   hasAction = false,
   hasPaging = true,
+  dispatchExCondition = [],
   ...others
 }) => {
   const {
@@ -107,7 +108,7 @@ const ReactTableLayout = ({
     if (hasPaging && !hasAction) {
       doDispatchAction(
         typeof dispatchAction === 'function' &&
-          dispatchAction(pageIndex, pageSizeTable)
+          dispatchAction(pageIndex, pageSizeTable, ...dispatchExCondition)
       );
     }
   }, [
@@ -121,7 +122,8 @@ const ReactTableLayout = ({
 
   useEffect(() => {
     if (!hasPaging && isReFetchWithNoPaging === true) {
-      typeof dispatchAction === 'function' && dispatchAction();
+      typeof dispatchAction === 'function' &&
+        dispatchAction(...dispatchExCondition);
       setIsReFetchWithNoPaging(false);
     }
   }, [hasPaging, dispatchAction]);

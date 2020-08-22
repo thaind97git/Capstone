@@ -12,13 +12,7 @@ import {
   getShopById,
   GetShopByIdDataSelector,
   getServicesByShopId,
-  GetServicesByShopIdDataSelector,
-  GetShopOwnerByIdDataSelector,
-  getShopOwnerById,
-  GetShopsDataSelector,
-  getShops,
-  GetShopByShopOwnerIdDataSelector,
-  getShopByShopOwnerId
+  GetServicesByShopIdDataSelector
 } from '../stores/ShopState';
 import { Done, Lock } from '@material-ui/icons';
 import CardSimpleLayout from '../layouts/CardSimpleLayout';
@@ -30,93 +24,100 @@ import { createLink } from '../libs';
 
 const connectToRedux = connect(
   createStructuredSelector({
-    branchesData: GetShopByShopOwnerIdDataSelector,
-    detailsData: GetShopOwnerByIdDataSelector
+    detailsData: GetShopByIdDataSelector,
+    servicesData: GetServicesByShopIdDataSelector
   }),
   dispatch => ({
-    getDetails: id => dispatch(getShopOwnerById(id)),
-    getShops: (page, pageSize, id) =>
-      dispatch(getShopByShopOwnerId({ page, pageSize, id }))
+    getDetails: id => dispatch(getShopById(id)),
+    getServicesByShopId: shopId => dispatch(getServicesByShopId({ shopId }))
   })
 );
 
 const COLUMNS = [
   {
-    field: 'avatar',
-    title: 'Avatar'
+    field: 'serviceName',
+    title: 'Service Name'
   },
   {
-    field: 'shopName',
-    title: 'Name'
+    field: 'price',
+    title: 'Price'
   },
   {
-    field: 'phoneNumber',
-    title: 'Phone'
-  },
-  {
-    field: 'numOfStart',
-    title: 'Rating'
-  },
-  {
-    field: 'email',
-    title: 'Email'
-  },
-  {
-    field: 'status',
-    title: 'Shop Status'
+    field: 'unit',
+    title: 'Unit'
   }
 ];
-const getBranchData = ({ branchesData = [] }) =>
-  branchesData &&
-  branchesData.map(
-    ({ avatarUrl, shopName, status, id, numOfStar, email, phoneNumber }) => ({
-      avatar: <AvatarComponent small url={avatarUrl} />,
-      shopName: (
-        <Link href={createLink(['shop-owner', 'shop', `details?id=${id}`])}>
-          <a>{shopName}</a>
-        </Link>
-      ),
-      phoneNumber: phoneNumber,
-      numOfStart: <RatingComponent star={numOfStar} />,
-      email: email,
-      status: (
-        <Chip
-          label={status ? 'Active' : 'Disabled'}
-          clickable
-          color={!status ? 'secondary' : 'default'}
-          deleteIcon={status ? <Done /> : <Lock />}
-          style={status ? { background: 'green', color: 'white' } : {}}
-        />
-      )
+
+const getData = ({ servicesData = [] }) => {
+  return (
+    servicesData &&
+    servicesData.map(shopService => {
+      const services = shopService.services || {};
+      return {
+        serviceName: services.serviceName,
+        description: shopService.description,
+        unit: services.unit,
+        price:
+          shopService.price &&
+          shopService.price.toLocaleString('it-IT', {
+            style: 'currency',
+            currency: 'VND'
+          })
+      };
     })
   );
+};
 
 const ShopDetailsComponent = ({
   detailsData,
   getDetails,
-  getShops,
-  branchesData
+  servicesData,
+  getServicesByShopId
 }) => {
   useEffect(() => {
     getDetails(Router.query.id);
   }, [getDetails]);
 
+  useEffect(() => {
+    getServicesByShopId(Router.query.id);
+  }, [getServicesByShopId]);
+
   const rows = [
     { label: 'Avatar', key: 'avatar' },
-    { label: 'Full Name', key: 'fullName' },
+    { label: 'Branch Name', key: 'shopName' },
     { label: 'Phone Number', key: 'phoneNumber' },
+    { label: 'Rating Star', key: 'rating' },
     { label: 'Email', key: 'email' },
     { label: 'Address', key: 'address' },
+    { label: 'Open Time', key: 'openTime' },
+    { label: 'Close Time', key: 'closeTime' },
+    { label: 'Description', key: 'description' },
     { label: 'Status', key: 'status' }
   ];
   let displays = {};
   if (detailsData) {
     displays = {
-      avatar: <AvatarComponent small url={detailsData.avatarUrl} />,
-      fullName: detailsData.fullName,
+      avatar: <AvatarComponent small url={detailsData.avtUrl} />,
+      shopName: detailsData.shopName,
       phoneNumber: detailsData.phoneNumber,
+      longtitude: detailsData.longtitude || <small>not yet defined</small>,
+      latitude: detailsData.latitude || <small>not yet defined</small>,
+      rating: <RatingComponent star={detailsData.numOfStar} /> || (
+        <small>not yet defined</small>
+      ),
       email: detailsData.email || <small>not yet defined</small>,
       address: detailsData.address || <small>not yet defined</small>,
+      description: detailsData.description || <small>not yet defined</small>,
+      openTime: detailsData.openTime ? (
+        detailsData.openTime
+      ) : (
+        <small>not yet defined</small>
+      ),
+      closeTime: detailsData.closeTime ? (
+        detailsData.closeTime
+      ) : (
+        <small>not yet defined</small>
+      ),
       status: (
         <Chip
           label={detailsData.status ? 'Active' : 'Disabled'}
@@ -131,17 +132,10 @@ const ShopDetailsComponent = ({
     };
   }
 
-  let totalCount = 0,
-    page = 0,
-    pageSize = 10;
-  if (branchesData) {
-    totalCount = branchesData.totalElements;
-  }
-
   return !detailsData ? (
     <MissingInfoComponent>
       <Typography variant="h5" color="secondary">
-        Not found any Shop
+        Not found any Branch
       </Typography>
     </MissingInfoComponent>
   ) : (
@@ -156,7 +150,20 @@ const ShopDetailsComponent = ({
                 alignItems="center"
                 direction="row"
               >
-                <Typography variant="h6">Shop Owner details</Typography>
+                <Typography variant="h6">Shop details</Typography>
+                {detailsData && detailsData.userInfoDTO.fullName && (
+                  <div>
+                    Owner:{' '}
+                    <Link
+                      href={createLink([
+                        'shop-owner',
+                        `details?id=${detailsData.userInfoDTO.id}`
+                      ])}
+                    >
+                      <a>{detailsData.userInfoDTO.fullName}</a>
+                    </Link>
+                  </div>
+                )}
               </Grid>
             }
             body={<InfoLayout subtitle="" rows={rows} displays={displays} />}
@@ -167,18 +174,15 @@ const ShopDetailsComponent = ({
         <Grid xs={12} item className="shadow-0">
           <CardSimpleLayout
             bodyStyle={{ padding: 0 }}
-            header={<Typography variant="h6">Branches</Typography>}
+            header={<Typography variant="h6">Shop Services</Typography>}
             body={
               <ReactTableLayout
-                dispatchExCondition={[Router.query.id]}
-                dispatchAction={getShops}
-                data={getBranchData({
-                  branchesData: (branchesData || {}).content || []
+                dispatchAction={() => getServicesByShopId(Router.query.id)}
+                hasPaging={false}
+                data={getData({
+                  servicesData: servicesData || []
                 })}
                 columns={COLUMNS}
-                totalCount={totalCount}
-                page={page}
-                pageSize={pageSize}
               />
             }
           />

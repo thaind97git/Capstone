@@ -10,19 +10,19 @@ import FrameHeaderComponent from './FrameHeaderComponent';
 import Button from '../layouts/Button';
 import AlertDialog from '../layouts/AlertDialog';
 import {
-  GetShopsDataSelector,
-  getShops,
-  AddNewShopDataSelector,
-  AddNewShopResetter,
-  DeleteShopResetter,
-  UpdateShopDataSelector,
-  UpdateShopResetter,
+  GetShopOwnersDataSelector,
+  getShopOwners,
+  AddNewShopOwnerDataSelector,
+  AddNewShopOwnerResetter,
+  DeleteShopOwnerResetter,
+  UpdateShopOwnerDataSelector,
+  UpdateShopOwnerResetter,
   AddNewServiceDataSelector,
   UpdateServiceDataSelector,
   AddNewServiceResetter,
   UpdateServiceResetter
 } from '../stores/ShopState';
-// import ShopAddingComponent from './ShopAddingComponent';
+// import ShopOwnerAddingComponent from './ShopOwnerAddingComponent';
 import ServiceActionComponent from './ServiceActionComponent';
 import ShortenContentComponent from './commons/ShortenContentComponent';
 import RatingComponent from './commons/RatingComponent';
@@ -34,17 +34,18 @@ import ShopActionsComponent from './ShopActionsComponent';
 
 const connectWithRedux = connect(
   createStructuredSelector({
-    shopsData: GetShopsDataSelector,
-    addShopSuccessMessage: AddNewShopDataSelector,
-    updateShopData: UpdateShopDataSelector
+    shopOwnerData: GetShopOwnersDataSelector,
+    addShopOwnerSuccessMessage: AddNewShopOwnerDataSelector,
+    updateShopOwnerData: UpdateShopOwnerDataSelector
   }),
   dispatch => ({
-    getShops: (page, pageSize) => dispatch(getShops({ page, pageSize })),
+    getShopOwners: (page, pageSize) =>
+      dispatch(getShopOwners({ page, pageSize })),
     resetData: () => {
       dispatch(AddNewServiceResetter);
       dispatch(UpdateServiceResetter);
     },
-    resetAddShopForm: () => dispatch(reset('addNewShop'))
+    resetAddShopOwnerForm: () => dispatch(reset('addNewShopOwner'))
   })
 );
 
@@ -77,44 +78,24 @@ const COLUMNS = [
     title: 'Avatar'
   },
   {
-    field: 'shopName',
-    title: 'Name'
+    field: 'fullName',
+    title: 'Full Name'
   },
-  {
-    field: 'owner',
-    title: 'Owner'
-  },
+  // {
+  //   field: 'owner',
+  //   title: 'Owner'
+  // },
   {
     field: 'phoneNumber',
     title: 'Phone'
   },
-  {
-    field: 'longtitude',
-    title: 'Longtitude'
-  },
-  {
-    field: 'latitude',
-    title: 'Latitude'
-  },
-  {
-    field: 'numOfStart',
-    title: 'Rating'
-  },
-  {
-    field: 'email',
-    title: 'Email'
-  },
-  {
-    field: 'address',
-    title: 'Address'
-  },
-  {
-    field: 'description',
-    title: 'Description'
-  },
+  // {
+  //   field: 'description',
+  //   title: 'Description'
+  // },
   {
     field: 'status',
-    title: 'Shop Status'
+    title: 'Status'
   },
   {
     field: 'actions',
@@ -122,37 +103,33 @@ const COLUMNS = [
   }
 ];
 
-const getData = ({ shopsData = [], setCurrentIdSelected, setIsOpenUpdate }) =>
-  shopsData &&
-  shopsData.map(
+const getData = ({
+  shopOwnerData = [],
+  setCurrentIdSelected,
+  setIsOpenUpdate
+}) =>
+  shopOwnerData &&
+  shopOwnerData.map(
     ({
-      avatarUrl,
-      shopName,
+      avtUrl,
+      fullName,
       status,
       id,
-      description,
-      longtitude,
-      latitude,
-      numOfStar,
       email,
       address,
       phoneNumber,
       user = {}
     }) => ({
-      avatar: <AvatarComponent small url={avatarUrl} />,
-      shopName: (
-        <Link href={createLink(['shop', `details?id=${id}`])}>
-          <a>{shopName}</a>
+      avatar: <AvatarComponent small url={avtUrl} />,
+      fullName: (
+        <Link href={createLink(['shop-owner', `details?id=${id}`])}>
+          <a>{fullName}</a>
         </Link>
       ),
       owner: (user || {}).fullName,
       phoneNumber: phoneNumber,
-      longtitude: longtitude,
-      latitude: latitude,
-      numOfStart: <RatingComponent star={numOfStar} />,
       email: email,
       address: <ShortenContentComponent content={address} />,
-      description: description,
       status: (
         <Chip
           label={status ? 'Active' : 'Disabled'}
@@ -162,62 +139,60 @@ const getData = ({ shopsData = [], setCurrentIdSelected, setIsOpenUpdate }) =>
           style={status ? { background: 'green', color: 'white' } : {}}
         />
       ),
-      actions: status
-        ? getActions({
-            status,
-            id,
-            setCurrentIdSelected,
-            setIsOpenUpdate
-          }).map(({ label, action, icon }, index) => (
-            <ButtonActionTableComponent
-              key={index}
-              label={label}
-              action={action}
-              icon={icon}
-            />
-          ))
-        : null
+      actions: getActions({
+        status,
+        id,
+        setCurrentIdSelected,
+        setIsOpenUpdate
+      }).map(({ label, action, icon }, index) => (
+        <ButtonActionTableComponent
+          key={index}
+          label={label}
+          action={action}
+          icon={icon}
+        />
+      ))
     })
   );
 
-const ShopManagementComponent = ({
-  shopsData,
-  getShops,
-  addShopSuccessMessage,
+const ShopOwnerManagementComponent = ({
+  shopOwnerData,
+  getShopOwners,
+  addShopOwnerSuccessMessage,
   resetData,
-  resetAddShopForm,
-  updateShopData
+  resetAddShopOwnerForm,
+  updateShopOwnerData
 }) => {
   const [isOpenAdd, setIsOpenAdd] = useState(false);
   const [isOpenUpdate, setIsOpenUpdate] = useState(false);
   const [currentIdSelected, setCurrentIdSelected] = useState(null);
 
   useEffect(() => {
-    if (addShopSuccessMessage) {
+    if (addShopOwnerSuccessMessage) {
       setIsOpenAdd(false);
       resetData();
-      resetAddShopForm();
+      resetAddShopOwnerForm();
     }
-  }, [addShopSuccessMessage]);
+  }, [addShopOwnerSuccessMessage]);
 
   useEffect(() => {
-    if (updateShopData) {
+    if (updateShopOwnerData) {
       setIsOpenUpdate(false);
       resetData();
     }
-  }, [updateShopData]);
+  }, [updateShopOwnerData]);
 
   let totalCount = 0,
     page = 0,
     pageSize = 10;
-  if (shopsData) {
-    totalCount = shopsData.totalElements;
+  if (shopOwnerData) {
+    totalCount = shopOwnerData.totalElements;
   }
 
   return (
     <React.Fragment>
       <AlertDialog
-        title="Add new Shop"
+        title="Add new Shop Owner"
         isOpenDialog={isOpenAdd}
         setIsOpenDialog={setIsOpenAdd}
         isFooter={false}
@@ -226,7 +201,7 @@ const ShopManagementComponent = ({
         content={isOpenAdd ? <ShopActionsComponent /> : null}
       />
       <AlertDialog
-        title="Update Shop"
+        title="Update Shop Owner"
         isOpenDialog={isOpenUpdate}
         setIsOpenDialog={setIsOpenUpdate}
         isFooter={false}
@@ -241,16 +216,13 @@ const ShopManagementComponent = ({
           setIsOpenUpdate(false);
         }}
       />
-      <FrameHeaderComponent title="Shop management">
-        {/* <RLink href="/shop/add">
-          <Button>Add new shop</Button>
-        </RLink> */}
-        <Button onClick={() => setIsOpenAdd(true)}>Add new shop</Button>
+      <FrameHeaderComponent title="Shop Owner management">
+        <Button onClick={() => setIsOpenAdd(true)}>Add new shop owner</Button>
       </FrameHeaderComponent>
       <ReactTableLayout
-        dispatchAction={getShops}
+        dispatchAction={getShopOwners}
         data={getData({
-          shopsData: (shopsData || {}).content || [],
+          shopOwnerData: (shopOwnerData || {}).content || [],
           setCurrentIdSelected,
           setIsOpenUpdate
         })}
@@ -263,4 +235,4 @@ const ShopManagementComponent = ({
   );
 };
 
-export default connectWithRedux(ShopManagementComponent);
+export default connectWithRedux(ShopOwnerManagementComponent);

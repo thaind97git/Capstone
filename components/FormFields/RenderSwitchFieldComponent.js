@@ -1,6 +1,7 @@
 import React from 'react';
 // import Switch from 'react-switch';
 import { Typography, Grid, makeStyles, Switch } from '@material-ui/core';
+import { parseBoolean } from '../../utils';
 const useStyles = makeStyles(theme => ({
   root: {
     marginBottom: theme.spacing(2),
@@ -15,10 +16,11 @@ const useStyles = makeStyles(theme => ({
 }));
 const RenderSwitchFieldComponent = ({
   meta,
-  input: { value, onChange },
+  input: { value = false, onChange },
   label,
   col
 }) => {
+  console.log({ value });
   const classes = useStyles();
   return (
     <React.Fragment>
@@ -28,11 +30,10 @@ const RenderSwitchFieldComponent = ({
         </Typography>
         <Grid className={classes.switch}>
           <Switch
-            checked={value || false}
+            checked={parseBoolean(value)}
             onChange={onChange}
             color="primary"
           />
-          {/* <Switch onChange={onChange} checked={value || false} /> */}
           {meta.touched && meta.error && (
             <span style={{ color: 'red' }}>{meta.error}</span>
           )}
